@@ -2,6 +2,28 @@ angular.module('wSQL.db', [
     'wSQL.db.config'
 ])
 .factory('wSQL', function(W_SQL_CONFIG, $q) {
+    var object_to_sql = function(data){
+        var i = 0, query = "", values = [];
+        for (var key in data) {
+            query += (i == 0 ? "?" : ",?");
+            values.push(data[key]);
+            ++i;
+        }
+        return {
+            keys: Object.keys(data).join(),
+            values: values,
+            query: query
+        }
+    },
+    array_to_sql = function(values){
+        var str = "";
+        values.forEach(function(v, k){
+            str += (k === 0 ? "?" : ", ?");
+        });
+        return str;
+    };
+
+
 
     var Db = (function(){
         var db, db_set = false;
@@ -73,7 +95,7 @@ angular.module('wSQL.db', [
     var ExecuteSql = function(){
         var
         _querySuccess = function(tx, results, callback){
-            console.debug("_querySuccess");
+            console.debug("querySuccess");
             try{
                 results.insertId;
                 return callback(results);
@@ -87,13 +109,7 @@ angular.module('wSQL.db', [
         },
 
         _queryDB = function(tx, sql, data, callback) {
-            console.info(sql);
-
-            console.log("data____")
-            console.log(data)
-
-//            var dd = "SELECT t.id, t.category_id FROM table1 AS t WHERE t.id  = ?";
-
+            console.info(sql, data);
             tx.executeSql(sql, data, function(tx, results){
                 _querySuccess(tx, results, callback);
             }, function(err){
@@ -109,9 +125,6 @@ angular.module('wSQL.db', [
 
         this.query = function(sql, data) {
             var deferred = $q.defer();
-
-            console.debug("data", data)
-
             Db.get().transaction(function(tx){
                 _queryDB(tx, sql, data || [], deferred.resolve);
             }, function(err){
@@ -143,6 +156,10 @@ angular.module('wSQL.db', [
             return {
                 where: _this.where,
                 where_in: _this.where_in,
+                and: _this.and,
+                or: _this.or,
+                and_in: _this.and_in,
+                or_in: _this.or_in,
                 join: _this.join,
                 left_join: _this.left_join,
                 order_by: _this.order_by,
@@ -193,6 +210,22 @@ angular.module('wSQL.db', [
             return __perform("having", arguments);
         };
 
+        this.or = function(){
+            return __perform("or", arguments);
+        };
+
+        this.and = function(){
+            return __perform("and", arguments);
+        };
+
+        this.or_in = function(){
+            return __perform("or_in", arguments);
+        };
+
+        this.and_in = function(){
+            return __perform("and_in", arguments);
+        };
+
         this.limit = function(){
             return __perform("limit", arguments);
         };
@@ -203,61 +236,61 @@ angular.module('wSQL.db', [
     };
 
     var SelectQueryBuilder = function(){
-        var
-        _sql = "",
-        _query_data = [],
-
-        where_flag = false,
-        having_flag = false;
+        var _sql = "", _query_data = [], _this = this;
 
         this.select = function(select){
-            return _sql = 'SELECT ' + (select ? select : "*") + ' ';
+            return _sql = 'SELECT ' + (select ? select : "*");
         };
 
         this.from = function(table, as) {
             return _sql += ' FROM ' + table + (as ? " AS "+as : "");
         };
 
-        this.where = function(operator1, operator2, comparator){
-            _sql += (where_flag ? " AND " : " WHERE ") + operator1;
-            where_flag = true;
-
-            if(comparator)
-                _sql += comparator;
-            else
-                _sql += "=";
-            _sql += "?";
+        this._where_query = function(type, operator1, operator2, comparator){
             _query_data.push(operator2);
-            return _sql;
+            return _sql+= " "+type+" "+operator1+(comparator ? comparator : "=")+"?";
         };
 
-        this.or = function(){
-
+        this.where = function(operator1, operator2, comparator){
+            return _this._where_query("WHERE", operator1, operator2, comparator);
         };
 
-        this.and = function(){
+        this.or = function(operator1, operator2, comparator){
+            return _this._where_query("OR", operator1, operator2, comparator);
+        };
 
+        this.and = function(operator1, operator2, comparator){
+            return _this._where_query("AND", operator1, operator2, comparator);
+        };
+
+        this._where_in_query = function(type, field, values){
+            _query_data = _query_data.concat(values);
+            return _sql += " "+type+" " + field+" IN ("+array_to_sql(values)+")";
         };
 
         this.where_in = function(field, values) {
-            _sql += (where_flag ? " AND " : " WHERE ");
-            var where = field+" IN (";
-            values.forEach(function(v,k){
-                where += ( k === 0 ? "?" : (", ?") );
-                _query_data.push(v);
-            });
-            return _sql += (where+")");
+            return _this._where_in_query("WHERE", field, values);
+        };
+
+        this.or_in = function(field, values){
+            return _this._where_in_query("OR", field, values);
+        };
+
+        this.and_in = function(field, values){
+            return _this._where_in_query("AND", field, values);
+        };
+
+        this._join_query = function(type, table, field1, field2, comparator) {
+            var on = (field1 + (comparator ? comparator : " = ") + field2);
+            return _sql += ' '+type+' JOIN ' + table + ' ON ' + on;
         };
 
         this.join = function(table, field1, field2, comparator) {
-            var on = (field1 + (comparator ? comparator : " = ") + field2);
-            return _sql += ' INNER JOIN ' + table + ' ON ' + on;
+            return _this._join_query("INNER", table, field1, field2, comparator);
         };
 
         this.left_join = function(table, field1, field2, comparator) {
-            var on = (field1 + (comparator ? comparator : " = ") + field2);
-            _sql += ' LEFT JOIN ' + table + ' ON ' + on;
-            return _select_methods;
+            return _this._join_query("LEFT", table, field1, field2, comparator);
         };
 
         this.order_by = function(order, desc) {
@@ -269,18 +302,8 @@ angular.module('wSQL.db', [
         };
 
         this.having = function(operator1, operator2, comparator) {
-            _sql += (having_flag ? " AND " : " HAVING ");
-            having_flag = true;
-
-            _sql += " ? ";
-            _query_data.push(operator1);
-            if(comparator)
-                _sql += (" "+comparator+" ");
-            else
-                _sql += (" = ");
-            _sql += " ? ";
             _query_data.push(operator2);
-            return _sql;
+            return _sql+= " HAVING "+operator1+(comparator ? comparator : "=")+"?";
         };
 
         this.limit = function(limit, offset) {
@@ -288,53 +311,33 @@ angular.module('wSQL.db', [
         };
 
         this.query = function() {
-//            var q = new ExecuteSql();
-
-            console.debug("_query_data", _query_data)
-
             return new ExecuteSql().query(_sql, _query_data);
         };
 
         this.row = function() {
             // return one row
-            _sql + ' LIMIT 1';
+            _sql += ' LIMIT 1';
             var q = new ExecuteSql();
             return q.query(_sql, _query_data);
         };
 
         this.col = function() {
             // return one col
-            _sql + ' LIMIT 1';
+            _sql += ' LIMIT 1';
             var q = new ExecuteSql(), deferred = $q.defer();
             q.query(_sql, _query_data).then(function(data){
-                if(data.length > 0 ){
-                    for(var i in data[0]) {
-                        deferred.resolve(data[0][i]);
-                        break;
-                    }
-                }else deferred.resolve([]);
+                deferred.resolve( data.length > 0 ? data[0][ Object.keys(data[0])[0] ] : [] );
             }, deferred.reject);
             return deferred.promise;
         };
-
     };
 
     var InsertQuery = function(){
         this.insert = function(table, data){
-            var sql = 'INSERT INTO ' + table + ' (', i = 0, values = [];
-            for (var key in data) {
-                sql += (i == 0 ? key : "," + key);
-                ++i;
-            }
-            i = 0;
-            sql += ') VALUES (';
-            for (var key in data) {
-                sql += (i == 0 ? "?" : ",?");
-                values.push(data[key]);
-                ++i;
-            }
-            sql += ')';
-            return new ExecuteSql().query(sql, values);
+            var
+            object_sql = object_to_sql(data),
+            sql = 'INSERT INTO '+ table +' ('+ object_sql.keys +') VALUES ('+ object_sql.query + ')';
+            return new ExecuteSql().query(sql, object_sql.values);
         }
     };
 
