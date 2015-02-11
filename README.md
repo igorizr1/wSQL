@@ -1,6 +1,10 @@
 # wSQL
 
+# A sample of config file(u need to set your DB schema there) can be found in this repo at src/wSQL.db.config.js (just cope it in your project)
+
+
 # no DOC yet but samples below -- pretty simple
+# also examples can be found in examples/example1
 
 ```javascript
 angular.module('sampleApp', [
