@@ -2,7 +2,7 @@
 
 # no DOC yet but samples below -- pretty simple
 
-
+```javascript
 angular.module('sampleApp', [
     "wSQL.db"
 ])
@@ -81,3 +81,5 @@ angular.module('sampleApp', [
     });
 
 });
+
+```
