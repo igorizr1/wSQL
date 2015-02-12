@@ -98,12 +98,12 @@ angular.module('wSQL.db', [
             console.debug("querySuccess");
             try{
                 results.insertId;
-                return callback(results);
+                return callback( JSON.parse(JSON.stringify( results )) );
             }catch(e){
                 var len = results.rows.length, db_result = [];
                 if(results.rows.length > 0)
                     for(var i = 0; i < len; i++)
-                        db_result[i] = results.rows.item(i);
+                        db_result[i] = JSON.parse(JSON.stringify( results.rows.item(i) ));
                 return (callback ? callback(db_result) : true);
             }
         },

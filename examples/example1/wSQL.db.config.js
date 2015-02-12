@@ -23,9 +23,9 @@ angular.module('wSQL.db.config', [])
 .constant("W_SQL_CONFIG", {
     PARAMS: {
         name: "my_db_name",
-        version: "my_db_version",
+        version: "1.0",
         sub_name: "my_db_sub_name",
-        size: "my_db_size"
+        size: 1000000
     },
     TABLES_SQL: {
         "table1"    :   [
