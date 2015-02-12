@@ -3,16 +3,20 @@ angular.module('wSQL.db', [
 ])
 .factory('wSQL', function(W_SQL_CONFIG, $q) {
     var object_to_sql = function(data){
-        var i = 0, query = "", values = [];
+        var i = 0, query = "", query_with_as = "", query_for_set = "", values = [];
         for (var key in data) {
             query += (i == 0 ? "?" : ",?");
+            query_with_as += (i == 0 ? "? as " : ",? as ")+key;
+            query_for_set += (i == 0 ? "" : ",") + key + "=?";
             values.push(data[key]);
             ++i;
         }
         return {
             keys: Object.keys(data).join(),
             values: values,
-            query: query
+            query: query,
+            query_with_as: query_with_as,
+            query_for_set: query_for_set
         }
     },
     array_to_sql = function(values){
@@ -98,12 +102,12 @@ angular.module('wSQL.db', [
             console.debug("querySuccess");
             try{
                 results.insertId;
-                return callback(results);
+                return callback( JSON.parse(JSON.stringify( results )) );
             }catch(e){
                 var len = results.rows.length, db_result = [];
                 if(results.rows.length > 0)
                     for(var i = 0; i < len; i++)
-                        db_result[i] = results.rows.item(i);
+                        db_result[i] = JSON.parse(JSON.stringify( results.rows.item(i) ));
                 return (callback ? callback(db_result) : true);
             }
         },
@@ -338,18 +342,145 @@ angular.module('wSQL.db', [
             object_sql = object_to_sql(data),
             sql = 'INSERT INTO '+ table +' ('+ object_sql.keys +') VALUES ('+ object_sql.query + ')';
             return new ExecuteSql().query(sql, object_sql.values);
+        };
+        this.batch_insert = function(table, data) {
+            var sql = 'INSERT INTO ' + table + ' ('+object_to_sql(data[0]).keys+')', sql_values = [];
+            data.forEach(function(row, k){
+                var row_sql = object_to_sql(row);
+                sql_values = sql_values.concat(row_sql.values);
+                if(k === 0)
+                    sql += ' SELECT '+row_sql.query_with_as;
+                else
+                    sql +=  ' UNION SELECT '+row_sql.query;
+            });
+            return new ExecuteSql().query(sql, sql_values);
         }
+    };
+
+    var UpdateQuery = function(){
+        var
+        __Query__ = new UpdateQueryBuilder(),
+        _this = this,
+        __perform = function(type, ___arguments){
+            __Query__[type].apply(__Query__[type], ___arguments);
+            return {
+                where: _this.where,
+                where_in: _this.where_in,
+                and: _this.and,
+                or: _this.or,
+                and_in: _this.and_in,
+                or_in: _this.or_in,
+                query: _this.query
+            }
+        };
+
+        this.update = function(){
+            return __perform("update", arguments);
+        };
+
+        this.where = function(){
+            return __perform("where", arguments);
+        };
+
+        this.where_in = function(){
+            return __perform("where_in", arguments);
+        };
+
+        this.or = function(){
+            return __perform("or", arguments);
+        };
+
+        this.and = function(){
+            return __perform("and", arguments);
+        };
+
+        this.or_in = function(){
+            return __perform("or_in", arguments);
+        };
+
+        this.and_in = function(){
+            return __perform("and_in", arguments);
+        };
+
+        this.query = __Query__.query;
+    };
+
+    var UpdateQueryBuilder = function(){
+        var _this = this, _sql = "", _query_data = [];
+
+        this.update = function(table, data) {
+            var sql_data = object_to_sql(data);
+            _query_data = sql_data.values;
+            return _sql += "UPDATE "+ table +" SET "+ sql_data.query_for_set;
+        };
+
+        /**
+         * this copy paste should be improved in future via inheritance
+         * ExecuteSql => QueryBuilder
+         *            =====> SelectQuery
+         *            =====> UpdateQuery
+         *            =====> InsertQuery
+         *
+         *   or insert can be inherited from ExecuteSql --however select & update need to have common QueryBuilder
+         *
+         *   also helper methods can be incapsulated inside QueryBuilder or ExecuteSql class
+         *   may be I need a CommonQuery class
+         */
+        this._where_query = function(type, operator1, operator2, comparator){
+            _query_data.push(operator2);
+            return _sql+= " "+type+" "+operator1+(comparator ? comparator : "=")+"?";
+        };
+
+        this.where = function(operator1, operator2, comparator){
+            return _this._where_query("WHERE", operator1, operator2, comparator);
+        };
+
+        this.or = function(operator1, operator2, comparator){
+            return _this._where_query("OR", operator1, operator2, comparator);
+        };
+
+        this.and = function(operator1, operator2, comparator){
+            return _this._where_query("AND", operator1, operator2, comparator);
+        };
+
+        this._where_in_query = function(type, field, values){
+            _query_data = _query_data.concat(values);
+            return _sql += " "+type+" " + field+" IN ("+array_to_sql(values)+")";
+        };
+
+        this.where_in = function(field, values) {
+            return _this._where_in_query("WHERE", field, values);
+        };
+
+        this.or_in = function(field, values){
+            return _this._where_in_query("OR", field, values);
+        };
+
+        this.and_in = function(field, values){
+            return _this._where_in_query("AND", field, values);
+        };
+
+        this.query = function() {
+            return new ExecuteSql().query(_sql, _query_data);
+        };
     };
 
     var API = {
         select: function(select){
             return new SelectQuery().select(select);
         },
-        update: function(){
-
+        update: function(table, data){
+            return new UpdateQuery().update(table, data);
         },
         insert: function(table, values) {
             return new InsertQuery().insert(table, values);
+        },
+        batch_insert: function(table, values){
+            if (typeof table != "string")
+                return false; // table is a string not an array
+            if (values instanceof Array === false)
+                return false; // data is array here
+            return new InsertQuery().batch_insert(table, values);
         },
         remove: function(){
 
