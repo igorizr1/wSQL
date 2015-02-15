@@ -2,6 +2,11 @@ angular.module('wSQL.db', [
     'wSQL.db.config'
 ])
 .factory('wSQL', function(W_SQL_CONFIG, $q) {
+
+    var _extends = function(child, parent) { for (var key in parent) { if (_hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; }, _hasProp = {}.hasOwnProperty;
+
+
+
     var object_to_sql = function(data){
         var i = 0, query = "", query_with_as = "", query_for_set = "", values = [];
         for (var key in data) {
@@ -96,9 +101,10 @@ angular.module('wSQL.db', [
         return API;
     };
 
-    var ExecuteSql = function(){
-        var
-        _querySuccess = function(tx, results, callback){
+    var ExecuteSql = (function(){
+        function ExecuteSql(){}
+
+        ExecuteSql.prototype._querySuccess = function(tx, results, callback){
             console.debug("querySuccess");
             try{
                 results.insertId;
@@ -110,34 +116,81 @@ angular.module('wSQL.db', [
                         db_result[i] = JSON.parse(JSON.stringify( results.rows.item(i) ));
                 return (callback ? callback(db_result) : true);
             }
-        },
+        };
 
-        _queryDB = function(tx, sql, data, callback) {
+        ExecuteSql.prototype._queryDB = function(tx, sql, data, callback) {
+            var _this = this;
             console.info(sql, data);
             tx.executeSql(sql, data, function(tx, results){
-                _querySuccess(tx, results, callback);
+                _this._querySuccess(tx, results, callback);
             }, function(err){
-                _errorCB(err, sql, data, callback);
+                _this._errorCB(err, sql, data, callback);
             });
-        },
+        };
 
-        _errorCB = function(err, sql, data, callback) {
+        ExecuteSql.prototype._errorCB = function(err, sql, data, callback) {
             console.error("Error processing SQL, error & sql below:");
             console.error(err);
             if(callback)callback({error:err});
         };
 
-        this.query = function(sql, data) {
-            var deferred = $q.defer();
+        ExecuteSql.prototype.query = function(sql, data) {
+            var deferred = $q.defer(), _this = this;
             Db.get().transaction(function(tx){
-                _queryDB(tx, sql, data || [], deferred.resolve);
+                _this._queryDB(tx, sql, data || [], deferred.resolve);
             }, function(err){
-                _errorCB(err, sql, deferred.reject);
+                _this._errorCB(err, sql, deferred.reject);
             });
             return deferred.promise;
         };
 
-    };
+        return ExecuteSql;
+
+    })();
+
+
+//    var ExecuteSql = function(){
+//        var
+//        _querySuccess = function(tx, results, callback){
+//            console.debug("querySuccess");
+//            try{
+//                results.insertId;
+//                return callback( JSON.parse(JSON.stringify( results )) );
+//            }catch(e){
+//                var len = results.rows.length, db_result = [];
+//                if(results.rows.length > 0)
+//                    for(var i = 0; i < len; i++)
+//                        db_result[i] = JSON.parse(JSON.stringify( results.rows.item(i) ));
+//                return (callback ? callback(db_result) : true);
+//            }
+//        },
+//
+//        _queryDB = function(tx, sql, data, callback) {
+//            console.info(sql, data);
+//            tx.executeSql(sql, data, function(tx, results){
+//                _querySuccess(tx, results, callback);
+//            }, function(err){
+//                _errorCB(err, sql, data, callback);
+//            });
+//        },
+//
+//        _errorCB = function(err, sql, data, callback) {
+//            console.error("Error processing SQL, error & sql below:");
+//            console.error(err);
+//            if(callback)callback({error:err});
+//        };
+//
+//        this.query = function(sql, data) {
+//            var deferred = $q.defer();
+//            Db.get().transaction(function(tx){
+//                _queryDB(tx, sql, data || [], deferred.resolve);
+//            }, function(err){
+//                _errorCB(err, sql, deferred.reject);
+//            });
+//            return deferred.promise;
+//        };
+//
+//    };
 
     var CreateQuery = function(){
         this.create = function(table, fields){
@@ -465,6 +518,112 @@ angular.module('wSQL.db', [
         };
     };
 
+    var DeleteQuery = function(){
+        var
+            __Query__ = new DeleteQueryBuilder(),
+            _this = this,
+            __perform = function(type, ___arguments){
+                __Query__[type].apply(__Query__[type], ___arguments);
+                return {
+                    where: _this.where,
+                    where_in: _this.where_in,
+                    and: _this.and,
+                    or: _this.or,
+                    and_in: _this.and_in,
+                    or_in: _this.or_in,
+                    query: _this.query
+                }
+            };
+
+        this.delete = function(){
+            return __perform("delete", arguments);
+        };
+
+        this.where = function(){
+            return __perform("where", arguments);
+        };
+
+        this.where_in = function(){
+            return __perform("where_in", arguments);
+        };
+
+        this.or = function(){
+            return __perform("or", arguments);
+        };
+
+        this.and = function(){
+            return __perform("and", arguments);
+        };
+
+        this.or_in = function(){
+            return __perform("or_in", arguments);
+        };
+
+        this.and_in = function(){
+            return __perform("and_in", arguments);
+        };
+
+        this.query = __Query__.query;
+    };
+
+    var DeleteQueryBuilder = function(){
+        var _this = this, _sql = "", _query_data = [];
+
+        this.delete = function(table) {
+            return _sql += "DELETE FROM "+ table + " ";
+        };
+
+        /**
+         * this copy paste should be improved in future via inheritance
+         * ExecuteSql => QueryBuilder
+         *            =====> SelectQuery
+         *            =====> UpdateQuery
+         *            =====> InsertQuery
+         *
+         *   or insert can be inherited from ExecuteSql --however select & update need to have common QueryBuilder
+         *
+         *   also helper methods can be incapsulated inside QueryBuilder or ExecuteSql class
+         *   may be I need a CommonQuery class
+         */
+        this._where_query = function(type, operator1, operator2, comparator){
+            _query_data.push(operator2);
+            return _sql+= " "+type+" "+operator1+(comparator ? comparator : "=")+"?";
+        };
+
+        this.where = function(operator1, operator2, comparator){
+            return _this._where_query("WHERE", operator1, operator2, comparator);
+        };
+
+        this.or = function(operator1, operator2, comparator){
+            return _this._where_query("OR", operator1, operator2, comparator);
+        };
+
+        this.and = function(operator1, operator2, comparator){
+            return _this._where_query("AND", operator1, operator2, comparator);
+        };
+
+        this._where_in_query = function(type, field, values){
+            _query_data = _query_data.concat(values);
+            return _sql += " "+type+" " + field+" IN ("+array_to_sql(values)+")";
+        };
+
+        this.where_in = function(field, values) {
+            return _this._where_in_query("WHERE", field, values);
+        };
+
+        this.or_in = function(field, values){
+            return _this._where_in_query("OR", field, values);
+        };
+
+        this.and_in = function(field, values){
+            return _this._where_in_query("AND", field, values);
+        };
+
+        this.query = function() {
+            return new ExecuteSql().query(_sql, _query_data);
+        };
+    };
+
     var API = {
         select: function(select){
             return new SelectQuery().select(select);
@@ -482,8 +641,8 @@ angular.module('wSQL.db', [
                 return false; // data is array here
             return new InsertQuery().batch_insert(table, values);
         },
-        remove: function(){
-
+        delete: function(table){
+            return new DeleteQuery().delete(table);
         }
     };
 

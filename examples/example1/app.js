@@ -1,7 +1,7 @@
 angular.module('sampleApp', [
     "wSQL.db"
 ])
-.controller('SampleController', function($scope, wSQL) {
+.controller('SampleController', function($scope, wSQL, $q) {
 
     console.log(wSQL);
     var rand = function(){
@@ -115,7 +115,12 @@ angular.module('sampleApp', [
             console.log(d);
         });
 
-
-
+    wSQL.delete("table1")
+        .where("id", 18)
+        .query()
+        .then(function(d){
+            console.log("d");
+            console.log(d);
+        });
 
 });
