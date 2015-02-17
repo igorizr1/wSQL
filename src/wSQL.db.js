@@ -154,7 +154,7 @@ angular.module('wSQL.db', [
             var
             object_sql = object_to_sql(data),
             sql = 'INSERT INTO '+ table +' ('+ object_sql.keys +') VALUES ('+ object_sql.query + ')';
-            return new InsertQuery().query(sql, object_sql.values);
+            return new ExecuteSql().query(sql, object_sql.values);
         };
         InsertQuery.prototype.batch_insert = function(table, data){
             var sql = 'INSERT INTO ' + table + ' ('+object_to_sql(data[0]).keys+')', sql_values = [];
@@ -166,7 +166,7 @@ angular.module('wSQL.db', [
                 else
                     sql +=  ' UNION SELECT '+row_sql.query;
             });
-            return new InsertQuery().query(sql, sql_values);
+            return new ExecuteSql().query(sql, sql_values);
         };
         return InsertQuery;
     })()
