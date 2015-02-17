@@ -292,10 +292,21 @@ angular.module('wSQL.db', [
             this.queryBuilderAPI = new CoreQueryBuilder();
         }
 
-        QueryBuilder.prototype.__perform = function(type, ___arguments){
-            var
-            _this = this,
-            responses = {
+        QueryBuilder.prototype.__perform = function(query_type, ___arguments){
+            var response_type = query_type, _this = this;
+            switch(query_type){
+                case 'where':
+                case 'where_in':
+                case 'and':
+                case 'and_in':
+                case 'or':
+                case 'or_in':
+                    response_type = "where";
+                    break;
+                default:
+                    response_type = query_type;
+            }
+            var responses = {
                 select: {
                     from: function(){return _this.from.apply(_this, arguments);}
                 },
@@ -385,8 +396,8 @@ angular.module('wSQL.db', [
                 }
             };
 
-            this.queryBuilderAPI[type].apply(this.queryBuilderAPI, ___arguments);
-            return responses[type];
+            this.queryBuilderAPI[query_type].apply(this.queryBuilderAPI, ___arguments);
+            return responses[response_type];
         };
 
         QueryBuilder.prototype.select = function(){return this.__perform("select", arguments);};
@@ -395,11 +406,11 @@ angular.module('wSQL.db', [
         QueryBuilder.prototype.delete = function(){return this.__perform("delete", arguments);};
         QueryBuilder.prototype.from = function(){return this.__perform("from", arguments);};
         QueryBuilder.prototype.where = function(){return this.__perform("where", arguments);};
-        QueryBuilder.prototype.where_in = function(){return this.__perform("where", arguments);};
-        QueryBuilder.prototype.or = function(){return this.__perform("where", arguments);};
-        QueryBuilder.prototype.and = function(){return this.__perform("where", arguments);};
-        QueryBuilder.prototype.or_in = function(){return this.__perform("where", arguments);};
-        QueryBuilder.prototype.and_in = function(){return this.__perform("where", arguments);};
+        QueryBuilder.prototype.where_in = function(){return this.__perform("where_in", arguments);};
+        QueryBuilder.prototype.or = function(){return this.__perform("or", arguments);};
+        QueryBuilder.prototype.and = function(){return this.__perform("and", arguments);};
+        QueryBuilder.prototype.or_in = function(){return this.__perform("or_in", arguments);};
+        QueryBuilder.prototype.and_in = function(){return this.__perform("and_in", arguments);};
         QueryBuilder.prototype.join = function(){return this.__perform("join", arguments);};
         QueryBuilder.prototype.left_join = function(){return this.__perform("join", arguments);};
         QueryBuilder.prototype.order_by = function(){return this.__perform("order_by", arguments);};
