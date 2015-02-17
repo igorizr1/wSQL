@@ -183,7 +183,7 @@ angular.module('wSQL.db', [
 
         CoreQueryBuilder.prototype.update = function(table, data) {
             this._sql = "UPDATE "+ table;
-            return data ? this.set() : this._sql;
+            return data ? this.set(data) : this._sql;
         };
 
         CoreQueryBuilder.prototype.set = function(data) {
