@@ -13,6 +13,13 @@ bower install w-sql
 * wSQL.update...
 * wSQL.delete...
 
+### optionally u can perform query directly with passing SQL
+* wSQL.query...
+
+### optionally u can perform queries upon tables
+* wSQL.create_table(table_name, table_fields)
+* wSQL.drop_table(table_name)
+
 ### methods to query request and generate results (all return promises):
 * query - get all results
 * row   - get one row

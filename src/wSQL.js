@@ -76,15 +76,15 @@ angular.module('wSQL', [
             console.warn("DB was cleaned");
             var drops = [];
             for(var t in tables_sql)
-                drops.push(new DropQuery().drop(t));
+                drops.push(new DropTableQuery().drop(t));
             $q.all(drops).then(function(){
                 for(var t in tables_sql)
-                    new CreateQuery().create(t, tables_sql[t]);
+                    new CreateTableQuery().create(t, tables_sql[t]);
             });
         }else{
             console.warn("DB was NOT cleaned");
             for(var t in tables_sql)
-                new CreateQuery().create(t, tables_sql[t])
+                new CreateTableQuery().create(t, tables_sql[t])
         }
 
         return API;
@@ -132,20 +132,20 @@ angular.module('wSQL', [
         return ExecuteSql;
     })()
 
-    , CreateQuery = (function(){
-        function CreateQuery(){}
-        CreateQuery.prototype.create = function(table, fields){
+    , CreateTableQuery = (function(){
+        function CreateTableQuery(){}
+        CreateTableQuery.prototype.create = function(table, fields){
             return new ExecuteSql().query("CREATE TABLE IF NOT EXISTS "+table+ "(" +fields.join() + ")", []);
         };
-        return CreateQuery;
+        return CreateTableQuery;
     })()
 
-    , DropQuery = (function(){
-        function DropQuery(){}
-        DropQuery.prototype.drop = function(table){
+    , DropTableQuery = (function(){
+        function DropTableQuery(){}
+            DropTableQuery.prototype.drop = function(table){
             return new ExecuteSql().query("DROP TABLE IF EXISTS "+table, []);
         };
-        return DropQuery;
+        return DropTableQuery;
     })()
 
     , InsertQuery = (function(){
@@ -463,6 +463,12 @@ angular.module('wSQL', [
         },
         query: function(sql, values){
             return new ExecuteSql().query(sql, values ? values : []);
+        },
+        create_table: function(table, fields){
+            return new CreateTableQuery().create(table, fields);
+        },
+        drop_table: function(table, fields){
+            return new DropTableQuery().drop(table);
         }
     };
 
