@@ -2,6 +2,8 @@ angular.module('wSQL.db', [
     'wSQL.db.config'
 ])
 .factory('wSQL', function(W_SQL_CONFIG, $q) {
+    var _extends = function(child, parent) { for (var key in parent) { if (_hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; }, _hasProp = {}.hasOwnProperty;
+
     var object_to_sql = function(data){
         var i = 0, query = "", query_with_as = "", query_for_set = "", values = [];
         for (var key in data) {
@@ -27,9 +29,8 @@ angular.module('wSQL.db', [
         return str;
     };
 
-
-
-    var Db = (function(){
+    var
+    Db = (function(){
         var db, db_set = false;
         return {
             get: function(){
@@ -41,9 +42,9 @@ angular.module('wSQL.db', [
                 return db;
             }
         }
-    }());
+    })()
 
-    var InitInterface = function(db_params, tables_sql, clear){
+    , InitInterface = function(db_params, tables_sql, clear){
         /**
          * db_params = {
          *      name: "my_db_name",
@@ -71,34 +72,27 @@ angular.module('wSQL.db', [
         }
         Db.set(db_params);
 
-
         if(clear){
             console.warn("DB was cleaned");
             var drops = [];
-            for(var t in tables_sql){
-                var dq = new DropQuery();
-                drops.push(dq.drop(t));
-            }
+            for(var t in tables_sql)
+                drops.push(new DropQuery().drop(t));
             $q.all(drops).then(function(){
-                for(var t in tables_sql){
-                    var cq = new CreateQuery();
-                    cq.create(t, tables_sql[t]);
-                }
+                for(var t in tables_sql)
+                    new CreateQuery().create(t, tables_sql[t]);
             });
         }else{
             console.warn("DB was NOT cleaned");
-            for(var t in tables_sql){
-                var cq = new CreateQuery();
-                cq.create(t, tables_sql[t])
-            }
+            for(var t in tables_sql)
+                new CreateQuery().create(t, tables_sql[t])
         }
 
         return API;
-    };
+    }
 
-    var ExecuteSql = function(){
-        var
-        _querySuccess = function(tx, results, callback){
+    , ExecuteSql = (function(){
+        function ExecuteSql(){}
+        ExecuteSql.prototype._querySuccess = function(tx, results, callback){
             console.debug("querySuccess");
             try{
                 results.insertId;
@@ -110,240 +104,59 @@ angular.module('wSQL.db', [
                         db_result[i] = JSON.parse(JSON.stringify( results.rows.item(i) ));
                 return (callback ? callback(db_result) : true);
             }
-        },
-
-        _queryDB = function(tx, sql, data, callback) {
+        };
+        ExecuteSql.prototype._queryDB = function(tx, sql, data, callback) {
+            var _this = this;
             console.info(sql, data);
             tx.executeSql(sql, data, function(tx, results){
-                _querySuccess(tx, results, callback);
+                _this._querySuccess(tx, results, callback);
             }, function(err){
-                _errorCB(err, sql, data, callback);
+                _this._errorCB(err, sql, data, callback);
             });
-        },
-
-        _errorCB = function(err, sql, data, callback) {
+        };
+        ExecuteSql.prototype._errorCB = function(err, sql, data, callback) {
             console.error("Error processing SQL, error & sql below:");
             console.error(err);
             if(callback)callback({error:err});
         };
 
-        this.query = function(sql, data) {
-            var deferred = $q.defer();
+        ExecuteSql.prototype.query = function(sql, data) {
+            var deferred = $q.defer(), _this = this;
             Db.get().transaction(function(tx){
-                _queryDB(tx, sql, data || [], deferred.resolve);
+                _this._queryDB(tx, sql, data || [], deferred.resolve);
             }, function(err){
-                _errorCB(err, sql, deferred.reject);
+                _this._errorCB(err, sql, deferred.reject);
             });
             return deferred.promise;
         };
+        return ExecuteSql;
+    })()
 
-    };
-
-    var CreateQuery = function(){
-        this.create = function(table, fields){
+    , CreateQuery = (function(){
+        function CreateQuery(){}
+        CreateQuery.prototype.create = function(table, fields){
             return new ExecuteSql().query("CREATE TABLE IF NOT EXISTS "+table+ "(" +fields.join() + ")", []);
-        }
-    };
+        };
+        return CreateQuery;
+    })()
 
-    var DropQuery = function(){
-        this.drop = function(table){
+    , DropQuery = (function(){
+        function DropQuery(){}
+        DropQuery.prototype.drop = function(table){
             return new ExecuteSql().query("DROP TABLE IF EXISTS "+table, []);
-        }
-    };
-
-    var SelectQuery = function(){
-        var
-        __Query__ = new SelectQueryBuilder(),
-        _this = this,
-        __perform = function(type, ___arguments){
-            __Query__[type].apply(__Query__[type], ___arguments);
-            return {
-                where: _this.where,
-                where_in: _this.where_in,
-                and: _this.and,
-                or: _this.or,
-                and_in: _this.and_in,
-                or_in: _this.or_in,
-                join: _this.join,
-                left_join: _this.left_join,
-                order_by: _this.order_by,
-                group_by: _this.group_by,
-                having: _this.having,
-                limit: _this.limit,
-                query: _this.query,
-                row: _this.row,
-                col: _this.col
-            }
         };
+        return DropQuery;
+    })()
 
-
-        this.select = function(){
-            __Query__.select.apply(__Query__.select, arguments);
-            return {from: _this.from}
-        };
-
-        this.from = function(){
-            return __perform("from", arguments);
-        };
-
-        this.where = function(){
-            return __perform("where", arguments);
-        };
-
-        this.where_in = function(){
-            return __perform("where_in", arguments);
-        };
-
-        this.join = function(){
-            return __perform("join", arguments);
-        };
-
-        this.left_join = function(){
-            return __perform("left_join", arguments);
-        };
-
-        this.order_by = function(){
-            return __perform("order_by", arguments);
-        };
-
-        this.group_by = function(){
-            return __perform("group_by", arguments);
-        };
-
-        this.having = function(){
-            return __perform("having", arguments);
-        };
-
-        this.or = function(){
-            return __perform("or", arguments);
-        };
-
-        this.and = function(){
-            return __perform("and", arguments);
-        };
-
-        this.or_in = function(){
-            return __perform("or_in", arguments);
-        };
-
-        this.and_in = function(){
-            return __perform("and_in", arguments);
-        };
-
-        this.limit = function(){
-            return __perform("limit", arguments);
-        };
-
-        this.query = __Query__.query;
-        this.row = __Query__.row;
-        this.col = __Query__.col;
-    };
-
-    var SelectQueryBuilder = function(){
-        var _sql = "", _query_data = [], _this = this;
-
-        this.select = function(select){
-            return _sql = 'SELECT ' + (select ? select : "*");
-        };
-
-        this.from = function(table, as) {
-            return _sql += ' FROM ' + table + (as ? " AS "+as : "");
-        };
-
-        this._where_query = function(type, operator1, operator2, comparator){
-            _query_data.push(operator2);
-            return _sql+= " "+type+" "+operator1+(comparator ? comparator : "=")+"?";
-        };
-
-        this.where = function(operator1, operator2, comparator){
-            return _this._where_query("WHERE", operator1, operator2, comparator);
-        };
-
-        this.or = function(operator1, operator2, comparator){
-            return _this._where_query("OR", operator1, operator2, comparator);
-        };
-
-        this.and = function(operator1, operator2, comparator){
-            return _this._where_query("AND", operator1, operator2, comparator);
-        };
-
-        this._where_in_query = function(type, field, values){
-            _query_data = _query_data.concat(values);
-            return _sql += " "+type+" " + field+" IN ("+array_to_sql(values)+")";
-        };
-
-        this.where_in = function(field, values) {
-            return _this._where_in_query("WHERE", field, values);
-        };
-
-        this.or_in = function(field, values){
-            return _this._where_in_query("OR", field, values);
-        };
-
-        this.and_in = function(field, values){
-            return _this._where_in_query("AND", field, values);
-        };
-
-        this._join_query = function(type, table, field1, field2, comparator) {
-            var on = (field1 + (comparator ? comparator : " = ") + field2);
-            return _sql += ' '+type+' JOIN ' + table + ' ON ' + on;
-        };
-
-        this.join = function(table, field1, field2, comparator) {
-            return _this._join_query("INNER", table, field1, field2, comparator);
-        };
-
-        this.left_join = function(table, field1, field2, comparator) {
-            return _this._join_query("LEFT", table, field1, field2, comparator);
-        };
-
-        this.order_by = function(order, desc) {
-            return _sql += ' ORDER BY ' + order + (desc ? ' DESC' : "");
-        };
-
-        this.group_by = function(group) {
-            return _sql += ' GROUP BY ' + group;
-        };
-
-        this.having = function(operator1, operator2, comparator) {
-            _query_data.push(operator2);
-            return _sql+= " HAVING "+operator1+(comparator ? comparator : "=")+"?";
-        };
-
-        this.limit = function(limit, offset) {
-            return _sql += ' LIMIT ' + limit + (offset ? (" OFFSET " + offset) : "");
-        };
-
-        this.query = function() {
-            return new ExecuteSql().query(_sql, _query_data);
-        };
-
-        this.row = function() {
-            // return one row
-            _sql += ' LIMIT 1';
-            var q = new ExecuteSql();
-            return q.query(_sql, _query_data);
-        };
-
-        this.col = function() {
-            // return one col
-            _sql += ' LIMIT 1';
-            var q = new ExecuteSql(), deferred = $q.defer();
-            q.query(_sql, _query_data).then(function(data){
-                deferred.resolve( data.length > 0 ? data[0][ Object.keys(data[0])[0] ] : [] );
-            }, deferred.reject);
-            return deferred.promise;
-        };
-    };
-
-    var InsertQuery = function(){
-        this.insert = function(table, data){
+    , InsertQuery = (function(){
+        function InsertQuery(){}
+        InsertQuery.prototype.insert = function(table, data){
             var
             object_sql = object_to_sql(data),
             sql = 'INSERT INTO '+ table +' ('+ object_sql.keys +') VALUES ('+ object_sql.query + ')';
             return new ExecuteSql().query(sql, object_sql.values);
         };
-        this.batch_insert = function(table, data) {
+        InsertQuery.prototype.batch_insert = function(table, data){
             var sql = 'INSERT INTO ' + table + ' ('+object_to_sql(data[0]).keys+')', sql_values = [];
             data.forEach(function(row, k){
                 var row_sql = object_to_sql(row);
@@ -354,123 +167,272 @@ angular.module('wSQL.db', [
                     sql +=  ' UNION SELECT '+row_sql.query;
             });
             return new ExecuteSql().query(sql, sql_values);
+        };
+        return InsertQuery;
+    })()
+
+    , CoreQueryBuilder = (function(){
+        function CoreQueryBuilder(){
+            this._sql = "";
+            this._query_data = [];
         }
-    };
 
-    var UpdateQuery = function(){
-        var
-        __Query__ = new UpdateQueryBuilder(),
-        _this = this,
-        __perform = function(type, ___arguments){
-            __Query__[type].apply(__Query__[type], ___arguments);
-            return {
-                where: _this.where,
-                where_in: _this.where_in,
-                and: _this.and,
-                or: _this.or,
-                and_in: _this.and_in,
-                or_in: _this.or_in,
-                query: _this.query
-            }
+        CoreQueryBuilder.prototype.select = function(select){
+            return this._sql = 'SELECT ' + (select ? select : "*");
         };
 
-        this.update = function(){
-            return __perform("update", arguments);
+        CoreQueryBuilder.prototype.update = function(table, data) {
+            this._sql = "UPDATE "+ table;
+            return data ? this.set(data) : this._sql;
         };
 
-        this.where = function(){
-            return __perform("where", arguments);
-        };
-
-        this.where_in = function(){
-            return __perform("where_in", arguments);
-        };
-
-        this.or = function(){
-            return __perform("or", arguments);
-        };
-
-        this.and = function(){
-            return __perform("and", arguments);
-        };
-
-        this.or_in = function(){
-            return __perform("or_in", arguments);
-        };
-
-        this.and_in = function(){
-            return __perform("and_in", arguments);
-        };
-
-        this.query = __Query__.query;
-    };
-
-    var UpdateQueryBuilder = function(){
-        var _this = this, _sql = "", _query_data = [];
-
-        this.update = function(table, data) {
+        CoreQueryBuilder.prototype.set = function(data) {
             var sql_data = object_to_sql(data);
-            _query_data = sql_data.values;
-            return _sql += "UPDATE "+ table +" SET "+ sql_data.query_for_set;
+            this._query_data = sql_data.values;
+            return this._sql += " SET "+ sql_data.query_for_set;
         };
 
-        /**
-         * this copy paste should be improved in future via inheritance
-         * ExecuteSql => QueryBuilder
-         *            =====> SelectQuery
-         *            =====> UpdateQuery
-         *            =====> InsertQuery
-         *
-         *   or insert can be inherited from ExecuteSql --however select & update need to have common QueryBuilder
-         *
-         *   also helper methods can be incapsulated inside QueryBuilder or ExecuteSql class
-         *   may be I need a CommonQuery class
-         */
-        this._where_query = function(type, operator1, operator2, comparator){
-            _query_data.push(operator2);
-            return _sql+= " "+type+" "+operator1+(comparator ? comparator : "=")+"?";
+        CoreQueryBuilder.prototype.delete = function(table) {
+            return this._sql = "DELETE FROM "+ table;
         };
 
-        this.where = function(operator1, operator2, comparator){
-            return _this._where_query("WHERE", operator1, operator2, comparator);
+        CoreQueryBuilder.prototype.from = function(table, as) {
+            return this._sql += ' FROM ' + table + (as ? " AS "+as : "");
         };
 
-        this.or = function(operator1, operator2, comparator){
-            return _this._where_query("OR", operator1, operator2, comparator);
+        CoreQueryBuilder.prototype._where_query = function(type, operator1, operator2, comparator){
+            this._query_data.push(operator2);
+            return this._sql+= " "+type+" "+operator1+(comparator ? comparator : "=")+"?";
         };
 
-        this.and = function(operator1, operator2, comparator){
-            return _this._where_query("AND", operator1, operator2, comparator);
+        CoreQueryBuilder.prototype.where = function(operator1, operator2, comparator){
+            return this._where_query("WHERE", operator1, operator2, comparator);
         };
 
-        this._where_in_query = function(type, field, values){
-            _query_data = _query_data.concat(values);
-            return _sql += " "+type+" " + field+" IN ("+array_to_sql(values)+")";
+        CoreQueryBuilder.prototype.or = function(operator1, operator2, comparator){
+            return this._where_query("OR", operator1, operator2, comparator);
         };
 
-        this.where_in = function(field, values) {
-            return _this._where_in_query("WHERE", field, values);
+        CoreQueryBuilder.prototype.and = function(operator1, operator2, comparator){
+            return this._where_query("AND", operator1, operator2, comparator);
         };
 
-        this.or_in = function(field, values){
-            return _this._where_in_query("OR", field, values);
+        CoreQueryBuilder.prototype._where_in_query = function(type, field, values){
+            this._query_data = this._query_data.concat(values);
+            return this._sql += " "+type+" " + field+" IN ("+array_to_sql(values)+")";
         };
 
-        this.and_in = function(field, values){
-            return _this._where_in_query("AND", field, values);
+        CoreQueryBuilder.prototype.where_in = function(field, values) {
+            return this._where_in_query("WHERE", field, values);
         };
 
-        this.query = function() {
-            return new ExecuteSql().query(_sql, _query_data);
+        CoreQueryBuilder.prototype.or_in = function(field, values){
+            return this._where_in_query("OR", field, values);
         };
-    };
 
-    var API = {
+        CoreQueryBuilder.prototype.and_in = function(field, values){
+            return this._where_in_query("AND", field, values);
+        };
+
+        CoreQueryBuilder.prototype._join_query = function(type, table, field1, field2, comparator) {
+            var on = (field1 + (comparator ? comparator : " = ") + field2);
+            return this._sql += ' '+type+' JOIN ' + table + ' ON ' + on;
+        };
+
+        CoreQueryBuilder.prototype.join = function(table, field1, field2, comparator) {
+            return this._join_query("INNER", table, field1, field2, comparator);
+        };
+
+        CoreQueryBuilder.prototype.left_join = function(table, field1, field2, comparator) {
+            return this._join_query("LEFT", table, field1, field2, comparator);
+        };
+
+        CoreQueryBuilder.prototype.order_by = function(order, desc) {
+            return this._sql += ' ORDER BY ' + order + (desc ? ' DESC' : "");
+        };
+
+        CoreQueryBuilder.prototype.group_by = function(group) {
+            return this._sql += ' GROUP BY ' + group;
+        };
+
+        CoreQueryBuilder.prototype.having = function(operator1, operator2, comparator) {
+            this._query_data.push(operator2);
+            return this._sql+= " HAVING "+operator1+(comparator ? comparator : "=")+"?";
+        };
+
+        CoreQueryBuilder.prototype.limit = function(limit, offset) {
+            return this._sql += ' LIMIT ' + limit + (offset ? (" OFFSET " + offset) : "");
+        };
+
+        CoreQueryBuilder.prototype.query = function() {
+            return new ExecuteSql().query(this._sql, this._query_data);
+        };
+
+        CoreQueryBuilder.prototype.row = function() {
+            // return one row
+            this._sql += ' LIMIT 1';
+            return new ExecuteSql().query(this._sql, this._query_data);
+        };
+
+        CoreQueryBuilder.prototype.col = function() {
+            // return one col
+            this._sql += ' LIMIT 1';
+            var deferred = $q.defer();
+            new ExecuteSql().query(this._sql, this._query_data).then(function(data){
+                deferred.resolve( data.length > 0 ? data[0][ Object.keys(data[0])[0] ] : [] );
+            }, deferred.reject);
+            return deferred.promise;
+        };
+
+        return CoreQueryBuilder;
+    })()
+
+    , QueryBuilder = (function(){
+        function QueryBuilder(){
+            this.queryBuilderAPI = new CoreQueryBuilder();
+        }
+
+        QueryBuilder.prototype.__perform = function(query_type, ___arguments){
+            var response_type = query_type, _this = this;
+            switch(query_type){
+                case 'where':
+                case 'where_in':
+                case 'and':
+                case 'and_in':
+                case 'or':
+                case 'or_in':
+                    response_type = "where";
+                    break;
+                default:
+                    response_type = query_type;
+            }
+            var responses = {
+                select: {
+                    from: function(){return _this.from.apply(_this, arguments);}
+                },
+                update: {
+                    set: function(){return _this.set.apply(_this, arguments);},
+                    where: function(){return _this.where.apply(_this, arguments);},
+                    where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    query: function(){return _this.query.apply(_this, arguments);}
+                },
+                set: {
+                    where: function(){return _this.where.apply(_this, arguments);},
+                    where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    query: function(){return _this.query.apply(_this, arguments);}
+                },
+                'delete': {
+                    where: function(){return _this.where.apply(_this, arguments);},
+                    where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    query: function(){return _this.query.apply(_this, arguments);}
+                },
+                from: {
+                    where: function(){return _this.where.apply(_this, arguments);},
+                    where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    join: function(){return _this.join.apply(_this, arguments);},
+                    left_join: function(){return _this.left_join.apply(_this, arguments);},
+                    order_by: function(){return _this.order_by.apply(_this, arguments);},
+                    group_by: function(){return _this.group_by.apply(_this, arguments);},
+                    limit: function(){return _this.limit.apply(_this, arguments);},
+                    query: function(){return _this.query.apply(_this, arguments);},
+                    row: function(){return _this.row.apply(_this, arguments);},
+                    col: function(){return _this.col.apply(_this, arguments);}
+                },
+                where: {
+                    and: function(){return _this.and.apply(_this, arguments);},
+                    or: function(){return _this.or.apply(_this, arguments);},
+                    and_in: function(){return _this.and_in.apply(_this, arguments);},
+                    or_in: function(){return _this.or_in.apply(_this, arguments);},
+                    order_by: function(){return _this.order_by.apply(_this, arguments);},
+                    group_by: function(){return _this.group_by.apply(_this, arguments);},
+                    limit: function(){return _this.limit.apply(_this, arguments);},
+                    query: function(){return _this.query.apply(_this, arguments);},
+                    row: function(){return _this.row.apply(_this, arguments);},
+                    col: function(){return _this.col.apply(_this, arguments);}
+                },
+                join: {
+                    where: function(){return _this.where.apply(_this, arguments);},
+                    where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    join: function(){return _this.join.apply(_this, arguments);},
+                    left_join: function(){return _this.left_join.apply(_this, arguments);},
+                    order_by: function(){return _this.order_by.apply(_this, arguments);},
+                    group_by: function(){return _this.group_by.apply(_this, arguments);},
+                    having: function(){return _this.having.apply(_this, arguments);},
+                    limit: function(){return _this.limit.apply(_this, arguments);},
+                    query: function(){return _this.query.apply(_this, arguments);},
+                    row: function(){return _this.row.apply(_this, arguments);},
+                    col: function(){return _this.col.apply(_this, arguments);}
+                },
+                group_by: {
+                    order_by: function(){return _this.order_by.apply(_this, arguments);},
+                    having: function(){return _this.having.apply(_this, arguments);},
+                    limit: function(){return _this.limit.apply(_this, arguments);},
+                    query: function(){return _this.query.apply(_this, arguments);},
+                    row: function(){return _this.row.apply(_this, arguments);},
+                    col: function(){return _this.col.apply(_this, arguments);}
+                },
+                order_by: {
+                    having: function(){return _this.having.apply(_this, arguments);},
+                    limit: function(){return _this.limit.apply(_this, arguments);},
+                    query: function(){return _this.query.apply(_this, arguments);},
+                    row: function(){return _this.row.apply(_this, arguments);},
+                    col: function(){return _this.col.apply(_this, arguments);}
+                },
+                having: {
+                    and: function(){return _this.and.apply(_this, arguments);},
+                    or: function(){return _this.or.apply(_this, arguments);},
+                    and_in: function(){return _this.and_in.apply(_this, arguments);},
+                    or_in: function(){return _this.or_in.apply(_this, arguments);},
+                    order_by: function(){return _this.order_by.apply(_this, arguments);},
+                    limit: function(){return _this.limit.apply(_this, arguments);},
+                    query: function(){return _this.query.apply(_this, arguments);},
+                    row: function(){return _this.row.apply(_this, arguments);},
+                    col: function(){return _this.col.apply(_this, arguments);}
+                },
+                limit: {
+                    query: function(){return _this.query.apply(_this, arguments);},
+                    row: function(){return _this.row.apply(_this, arguments);},
+                    col: function(){return _this.col.apply(_this, arguments);}
+                }
+            };
+
+            this.queryBuilderAPI[query_type].apply(this.queryBuilderAPI, ___arguments);
+            return responses[response_type];
+        };
+
+        QueryBuilder.prototype.select = function(){return this.__perform("select", arguments);};
+        QueryBuilder.prototype.update = function(){return this.__perform("update", arguments);};
+        QueryBuilder.prototype.set = function(){return this.__perform("set", arguments);};
+        QueryBuilder.prototype.delete = function(){return this.__perform("delete", arguments);};
+        QueryBuilder.prototype.from = function(){return this.__perform("from", arguments);};
+        QueryBuilder.prototype.where = function(){return this.__perform("where", arguments);};
+        QueryBuilder.prototype.where_in = function(){return this.__perform("where_in", arguments);};
+        QueryBuilder.prototype.or = function(){return this.__perform("or", arguments);};
+        QueryBuilder.prototype.and = function(){return this.__perform("and", arguments);};
+        QueryBuilder.prototype.or_in = function(){return this.__perform("or_in", arguments);};
+        QueryBuilder.prototype.and_in = function(){return this.__perform("and_in", arguments);};
+        QueryBuilder.prototype.join = function(){return this.__perform("join", arguments);};
+        QueryBuilder.prototype.left_join = function(){return this.__perform("join", arguments);};
+        QueryBuilder.prototype.order_by = function(){return this.__perform("order_by", arguments);};
+        QueryBuilder.prototype.group_by = function(){return this.__perform("group_by", arguments);};
+        QueryBuilder.prototype.having = function(){return this.__perform("having", arguments);};
+        QueryBuilder.prototype.limit = function(){return this.__perform("limit", arguments);};
+////        SelectQuery.prototype.query = SelectQuery.__super__.query;
+////        SelectQuery.prototype.row = SelectQuery.__super__.row;
+////        SelectQuery.prototype.col = SelectQuery.__super__.col;
+        QueryBuilder.prototype.query = function(){return this.queryBuilderAPI.query();};
+        QueryBuilder.prototype.row = function(){return this.queryBuilderAPI.row();};
+        QueryBuilder.prototype.col = function(){return this.queryBuilderAPI.col();};
+        return QueryBuilder;
+    })()
+//    })(QueryBuilder)
+
+    , API = {
         select: function(select){
-            return new SelectQuery().select(select);
+            return new QueryBuilder().select(select);
         },
         update: function(table, data){
-            return new UpdateQuery().update(table, data);
+            return new QueryBuilder().update(table, data);
         },
         insert: function(table, values) {
             return new InsertQuery().insert(table, values);
@@ -482,8 +444,8 @@ angular.module('wSQL.db', [
                 return false; // data is array here
             return new InsertQuery().batch_insert(table, values);
         },
-        remove: function(){
-
+        delete: function(table){
+            return new QueryBuilder().delete(table);
         }
     };
 
