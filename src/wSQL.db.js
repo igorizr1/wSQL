@@ -368,6 +368,10 @@ angular.module('wSQL.db', [
                     col: function(){return _this.col.apply(_this, arguments);}
                 },
                 having: {
+                    and: function(){return _this.and.apply(_this, arguments);},
+                    or: function(){return _this.or.apply(_this, arguments);},
+                    and_in: function(){return _this.and_in.apply(_this, arguments);},
+                    or_in: function(){return _this.or_in.apply(_this, arguments);},
                     order_by: function(){return _this.order_by.apply(_this, arguments);},
                     limit: function(){return _this.limit.apply(_this, arguments);},
                     query: function(){return _this.query.apply(_this, arguments);},
