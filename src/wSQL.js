@@ -428,11 +428,25 @@ angular.module('wSQL', [
 //    })(QueryBuilder)
 
     , API = {
+        /**
+         * Stuff to add:
+         *  - tests
+         *  - inheritance
+         *  - validation
+         *  - insert_or_ignore
+         *  - batch_insert_or_ignore
+         *  - replace
+         *  - batch_replace
+         *  - insert_on_duplicate_key_update
+         *  - batch_insert_on_duplicate_key_update
+         *  - create_table
+         *  - drop_table
+         */
         select: function(select){
             return new QueryBuilder().select(select);
         },
-        update: function(table, data){
-            return new QueryBuilder().update(table, data);
+        update: function(table, values){
+            return new QueryBuilder().update(table, values);
         },
         insert: function(table, values) {
             return new InsertQuery().insert(table, values);
@@ -446,9 +460,19 @@ angular.module('wSQL', [
         },
         delete: function(table){
             return new QueryBuilder().delete(table);
+        },
+        query: function(sql, values){
+            return new ExecuteSql().query(sql, values ? values : []);
         }
     };
 
-    return InitInterface(W_SQL_CONFIG.PARAMS, W_SQL_CONFIG.TABLES_SQL, W_SQL_CONFIG.CLEAR);
-
+    /**
+     * init library
+     */
+    if(W_SQL_CONFIG && W_SQL_CONFIG.PARAMS && W_SQL_CONFIG.TABLES_SQL)
+        return InitInterface(W_SQL_CONFIG.PARAMS, W_SQL_CONFIG.TABLES_SQL, W_SQL_CONFIG.CLEAR);
+    else{
+        console.error("wSQL.config is not correct");
+        return false;
+    }
 });

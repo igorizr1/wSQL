@@ -123,4 +123,31 @@ angular.module('sampleApp', [
             console.log(d);
         });
 
+    /**
+     * Direct Queries
+     * (better to use ORM stuff)
+      */
+    // Simple direct query
+    wSQL.query("SELECT * FROM table1").then(function(result){
+        console.log(result);
+    });
+
+    // Direct Query with params in SQL
+    wSQL.query("SELECT * FROM table1 WHERE id IN (1,5)").then(function(result){
+        console.log(result);
+    });
+
+    // Pass query params in second argument to avoid escape errors
+    wSQL.query("SELECT * FROM table1 WHERE category_name=?", ["'♥,♥,|'♥,♥,♥'"]).then(function(result){
+        console.log(result);
+    });
+
+    // Or u can get error
+    wSQL.query("SELECT * FROM table1 WHERE category_name= '♥,♥,|'♥,♥,♥'").then(function(result){
+        console.log(result);
+    }, function(error){
+        console.log("___error");
+        console.log(error);
+    });
+
 });
