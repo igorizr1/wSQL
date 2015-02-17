@@ -1,18 +1,22 @@
 # wSQL
-# wSQL - angularJS active record module for WebSQLite database - database in the browser. U can persist your data for your PhoneGap HTML5 applications build with ionic or angular. Good solution for mobile applications with offline mode.
-# A sample of config file(u need to set your DB schema there) can be found in this repo at src/wSQL.db.config.js (just cope it in your project)
+wSQL - angularJS active record module for WebSQLite database - database in the browser. U can persist your data for your PhoneGap HTML5 applications build with ionic or angular. Good solution for mobile applications with offline mode.
 
-#methods:
-wSQL.select...
-wSQL.insert...
-wSQL.batch_insert...
-wSQL.update...
-wSQL.delete...
+### install from bower
+bower install w-sql
 
-#methods to query request and generate results (all return promises):
-query - get all results
-row   - get one row
-col   - get one column
+### A sample of config file(u need to set your DB schema there) can be found in this repo at src/wSQL.db.config.js (just cope it in your project)
+
+### methods:
+* wSQL.select...
+* wSQL.insert...
+* wSQL.batch_insert...
+* wSQL.update...
+* wSQL.delete...
+
+### methods to query request and generate results (all return promises):
+* query - get all results
+* row   - get one row
+* col   - get one column
 ```javascript
 
     ...
@@ -26,23 +30,23 @@ col   - get one column
 
 ```
 
-#list of query modifiers:
-where
-where_in
-and
-and_in
-or
-or_in
-join
-left_join
-having
-group_by
-order_by
-limit //limit also does offset as a second argument
+### list of query modifiers:
+* where
+* where_in
+* and
+* and_in
+* or
+* or_in
+* join
+* left_join
+* having
+* group_by
+* order_by
+* limit //limit also does offset as a second argument
 
 
-# no full DOC yet but samples below -- pretty simple
-# also examples can be found in examples/example1
+## no full DOC yet but samples below -- pretty simple
+## also examples can be found in examples/example1
 
 ```javascript
 angular.module('sampleApp', [

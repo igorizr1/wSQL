@@ -20,7 +20,7 @@
  *
  * }
  */
-angular.module('wSQL.db.config', [])
+angular.module('wSQL.config', [])
 .constant("W_SQL_CONFIG", {
     PARAMS: {
         name: "test_db",

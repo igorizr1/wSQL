@@ -1,5 +1,5 @@
-angular.module('wSQL.db', [
-    'wSQL.db.config'
+angular.module('wSQL', [
+    'wSQL.config'
 ])
 .factory('wSQL', function(W_SQL_CONFIG, $q) {
     var _extends = function(child, parent) { for (var key in parent) { if (_hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; }, _hasProp = {}.hasOwnProperty;

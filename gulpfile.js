@@ -15,11 +15,11 @@ var config = {
     SRC_SCRIPTS: [
         '!./**/*_test.js',
 
-        "./src/wSQL.db.js"
+        "./src/wSQL.js"
     ],
     EXAMPLE_SCRIPTS: [
         //example 1
-        './examples/example1/wSQL.db.config.js',
+        './examples/example1/wSQL.config.js',
         './examples/example1/app.js'
     ],
     BOWER_SCRIPTS: [
@@ -31,7 +31,7 @@ var config = {
 gulp.task('scripts_min_prod', function () {
     gulp.src(config.SRC_SCRIPTS)
         .pipe(sourcemaps.init())
-        .pipe(concat('wSQL.db.min.js'))
+        .pipe(concat('wSQL.min.js'))
         .pipe(ngAnnotate())
         .pipe(uglify())
         .pipe(sourcemaps.write())
@@ -46,15 +46,15 @@ gulp.task('scripts_min', function () {
         .pipe(ngAnnotate())
         .pipe(uglify())
         .pipe(sourcemaps.write())
-        .pipe(gulp.dest('./play'));
+        .pipe(gulp.dest('./dev'));
 
     gulp.src(config.SRC_SCRIPTS)
         .pipe(sourcemaps.init())
-        .pipe(concat('wSQL.db.min.js'))
+        .pipe(concat('wSQL.min.js'))
         .pipe(ngAnnotate())
         .pipe(uglify())
         .pipe(sourcemaps.write())
-        .pipe(gulp.dest('./play'));
+        .pipe(gulp.dest('./dev'));
 });
 
 gulp.task('scripts_dev', function () {
@@ -62,32 +62,32 @@ gulp.task('scripts_dev', function () {
         .pipe(sourcemaps.init())
         .pipe(concat('app.min.js'))
         .pipe(sourcemaps.write())
-        .pipe(gulp.dest('./play'));
+        .pipe(gulp.dest('./dev'));
 
     gulp.src(config.SRC_SCRIPTS)
         .pipe(sourcemaps.init())
-        .pipe(concat('wSQL.db.min.js'))
+        .pipe(concat('wSQL.min.js'))
         .pipe(sourcemaps.write())
-        .pipe(gulp.dest('./play'));
+        .pipe(gulp.dest('./dev'));
 });
 
 gulp.task('vendorBOWER', function () {
     gulp.src(config.BOWER_SCRIPTS)
         .pipe(plugins.concat('bower-components.min.js'))
-        .pipe(gulp.dest('./play'));
+        .pipe(gulp.dest('./dev'));
     gulp.src('./bower_components/angular-sanitize/angular-sanitize.min.js.map')
-        .pipe(gulp.dest('./play'));
+        .pipe(gulp.dest('./dev'));
 });
 
 gulp.task('copy_index', function () {
     gulp.src('./examples/example1/index.html')
-        .pipe(gulp.dest('./play'));
+        .pipe(gulp.dest('./dev'));
 });
 
 gulp.task('watch_min', function () {
     gulp.watch([
-        'play/**/*.html',
-        'play/**/*.js'
+        'dev/**/*.html',
+        'dev/**/*.js'
     ], function (event) {
         return gulp.src(event.path)
             .pipe(plugins.connect.reload());
@@ -98,8 +98,8 @@ gulp.task('watch_min', function () {
 
 gulp.task('watch_dev', function () {
     gulp.watch([
-        'play/**/*.html',
-        'play/**/*.js'
+        'dev/**/*.html',
+        'dev/**/*.js'
     ], function (event) {
         return gulp.src(event.path)
             .pipe(plugins.connect.reload());
@@ -109,13 +109,13 @@ gulp.task('watch_dev', function () {
 });
 
 gulp.task('connect', plugins.connect.server({
-    root: ['play'],
+    root: ['dev'],
     port: 9000,
     livereload: true
 }));
 
 gulp.task('clean', function () {
-    return gulp.src('./play', {read: false})
+    return gulp.src('./dev', {read: false})
         .pipe(clean({force: true}));
 });
 
@@ -123,4 +123,4 @@ gulp.task('default', ['scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', '
 
 gulp.task('build',   ['scripts_min', 'copy_index', 'vendorBOWER', 'connect']);
 
-gulp.task('prod',   ['scripts_min_prod']);
+gulp.task('dist',   ['scripts_min_prod']);
