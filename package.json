@@ -1,6 +1,6 @@
 {
-  "name": "wSQL_db",
-  "version": "0.5.0",
+  "name": "wSQL",
+  "version": "0.5.2",
   "description": "",
   "main": "gulpfile.js",
   "directories": {

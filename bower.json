@@ -1,6 +1,6 @@
 {
-  "name": "wSQL.db",
-  "version": "0.5.0",
+  "name": "w-sql",
+  "version": "0.5.2",
   "homepage": "https://github.com/igorizr1/wSQL",
   "authors": [
     "igorizr1@gmail.com"

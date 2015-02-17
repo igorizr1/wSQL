@@ -430,7 +430,6 @@ angular.module('wSQL', [
         /**
          * Stuff to add:
          *  - tests
-         *  - inheritance
          *  - validation
          *  - insert_or_ignore
          *  - batch_insert_or_ignore
