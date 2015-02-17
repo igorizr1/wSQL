@@ -15,11 +15,11 @@ var config = {
     SRC_SCRIPTS: [
         '!./**/*_test.js',
 
-        "./src/wSQL.js"
+        "./src/wSQL.db.js"
     ],
     EXAMPLE_SCRIPTS: [
         //example 1
-        './examples/example1/wSQL.config.js',
+        './examples/example1/wSQL.db.config.js',
         './examples/example1/app.js'
     ],
     BOWER_SCRIPTS: [
@@ -31,7 +31,7 @@ var config = {
 gulp.task('scripts_min_prod', function () {
     gulp.src(config.SRC_SCRIPTS)
         .pipe(sourcemaps.init())
-        .pipe(concat('wSQL.min.js'))
+        .pipe(concat('wSQL.db.min.js'))
         .pipe(ngAnnotate())
         .pipe(uglify())
         .pipe(sourcemaps.write())
@@ -50,7 +50,7 @@ gulp.task('scripts_min', function () {
 
     gulp.src(config.SRC_SCRIPTS)
         .pipe(sourcemaps.init())
-        .pipe(concat('wSQL.min.js'))
+        .pipe(concat('wSQL.db.min.js'))
         .pipe(ngAnnotate())
         .pipe(uglify())
         .pipe(sourcemaps.write())
@@ -66,7 +66,7 @@ gulp.task('scripts_dev', function () {
 
     gulp.src(config.SRC_SCRIPTS)
         .pipe(sourcemaps.init())
-        .pipe(concat('wSQL.min.js'))
+        .pipe(concat('wSQL.db.min.js'))
         .pipe(sourcemaps.write())
         .pipe(gulp.dest('./play'));
 });

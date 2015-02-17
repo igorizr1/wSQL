@@ -1,7 +1,7 @@
 angular.module('sampleApp', [
-    "wSQL"
+    "wSQL.db"
 ])
-.controller('SampleController', function($scope, wSQL) {
+.controller('SampleController', function($scope, wSQL, $q) {
 
     console.log(wSQL);
     var rand = function(){

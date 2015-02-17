@@ -1,9 +1,6 @@
 # wSQL
 wSQL - angularJS active record module for WebSQLite database - database in the browser. U can persist your data for your PhoneGap HTML5 applications build with ionic or angular. Good solution for mobile applications with offline mode.
 
-## install from bower
-bower install w-sql
-
 ### A sample of config file(u need to set your DB schema there) can be found in this repo at src/wSQL.db.config.js (just cope it in your project)
 
 ### methods:
