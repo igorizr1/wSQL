@@ -29,8 +29,7 @@ angular.module('wSQL', [
         return str;
     };
 
-    var
-    Db = (function(){
+    var Db = (function(){
         var db, db_set = false;
         return {
             get: function(){
@@ -287,26 +286,19 @@ angular.module('wSQL', [
         return CoreQueryBuilder;
     })()
 
-    , QueryBuilder = (function(){
+    , QueryBuilder = (function(_super){// extends CoreQueryBuilder
+
+        _extends(QueryBuilder, _super);
+
         function QueryBuilder(){
-            this.queryBuilderAPI = new CoreQueryBuilder();
+            return QueryBuilder.__super__.constructor.apply(this, arguments);
         }
 
         QueryBuilder.prototype.__perform = function(query_type, ___arguments){
-            var response_type = query_type, _this = this;
-            switch(query_type){
-                case 'where':
-                case 'where_in':
-                case 'and':
-                case 'and_in':
-                case 'or':
-                case 'or_in':
-                    response_type = "where";
-                    break;
-                default:
-                    response_type = query_type;
-            }
-            var responses = {
+            var
+            _this = this,
+            response_type = query_type,
+            responses = {
                 select: {
                     from: function(){return _this.from.apply(_this, arguments);}
                 },
@@ -395,11 +387,22 @@ angular.module('wSQL', [
                     col: function(){return _this.col.apply(_this, arguments);}
                 }
             };
+            switch(query_type){
+                case 'where':
+                case 'where_in':
+                case 'and':
+                case 'and_in':
+                case 'or':
+                case 'or_in':
+                    response_type = "where";
+                    break;
+                default:
+                    response_type = query_type;
+            }
 
-            this.queryBuilderAPI[query_type].apply(this.queryBuilderAPI, ___arguments);
+            QueryBuilder.__super__[query_type].apply(this, ___arguments); // call Parent class method
             return responses[response_type];
         };
-
         QueryBuilder.prototype.select = function(){return this.__perform("select", arguments);};
         QueryBuilder.prototype.update = function(){return this.__perform("update", arguments);};
         QueryBuilder.prototype.set = function(){return this.__perform("set", arguments);};
@@ -417,15 +420,11 @@ angular.module('wSQL', [
         QueryBuilder.prototype.group_by = function(){return this.__perform("group_by", arguments);};
         QueryBuilder.prototype.having = function(){return this.__perform("having", arguments);};
         QueryBuilder.prototype.limit = function(){return this.__perform("limit", arguments);};
-////        SelectQuery.prototype.query = SelectQuery.__super__.query;
-////        SelectQuery.prototype.row = SelectQuery.__super__.row;
-////        SelectQuery.prototype.col = SelectQuery.__super__.col;
-        QueryBuilder.prototype.query = function(){return this.queryBuilderAPI.query();};
-        QueryBuilder.prototype.row = function(){return this.queryBuilderAPI.row();};
-        QueryBuilder.prototype.col = function(){return this.queryBuilderAPI.col();};
+        QueryBuilder.prototype.query = QueryBuilder.__super__.query;
+        QueryBuilder.prototype.row = QueryBuilder.__super__.row;
+        QueryBuilder.prototype.col = QueryBuilder.__super__.col;
         return QueryBuilder;
-    })()
-//    })(QueryBuilder)
+    })(CoreQueryBuilder)
 
     , API = {
         /**
@@ -439,8 +438,6 @@ angular.module('wSQL', [
          *  - batch_replace
          *  - insert_on_duplicate_key_update
          *  - batch_insert_on_duplicate_key_update
-         *  - create_table
-         *  - drop_table
          */
         select: function(select){
             return new QueryBuilder().select(select);
@@ -467,7 +464,7 @@ angular.module('wSQL', [
         create_table: function(table, fields){
             return new CreateTableQuery().create(table, fields);
         },
-        drop_table: function(table, fields){
+        drop_table: function(table){
             return new DropTableQuery().drop(table);
         }
     };
