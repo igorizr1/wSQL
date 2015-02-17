@@ -8,7 +8,7 @@ angular.module('sampleApp', [
         return Math.round(Math.random()*10);
     };
 
-//    //SELECT id, category_id FROM table1 WHERE id=? LIMIT 1
+    // SELECT id, category_id FROM table1 WHERE id=? LIMIT 1
     wSQL.select("id, category_id")
         .from("table1")
         .where("id", 3)
@@ -17,7 +17,7 @@ angular.module('sampleApp', [
             console.log(d);
         });
 
-//    //SELECT * FROM table1 WHERE id>? AND category_id=? OR category_id=? LIMIT 1
+    // SELECT * FROM table1 WHERE id>? AND category_id=? OR category_id=? LIMIT 1
     wSQL.select("*")
         .from("table1")
         .where("id", 3, ">")
@@ -28,7 +28,7 @@ angular.module('sampleApp', [
             console.log(d);
         });
 
-    //SELECT * FROM table1 WHERE id IN (?, ?, ?)
+    // SELECT * FROM table1 WHERE id IN (?, ?, ?)
     wSQL.select()
         .from("table1")
         .where_in("id", [3,4,6])
@@ -37,7 +37,7 @@ angular.module('sampleApp', [
             console.log(d);
         });
 
-    //SELECT id, category_id, count(*) as amount FROM table1 GROUP BY category_id
+    // SELECT id, category_id, count(*) as amount FROM table1 GROUP BY category_id
     wSQL.select("id, category_id, count(*) as amount")
         .from("table1")
         .group_by("category_id")
@@ -46,7 +46,7 @@ angular.module('sampleApp', [
             console.log(d);
         });
 
-    //SELECT id, category_id, count(*) as amount FROM table1 GROUP BY category_id HAVING category_id=? OR category_id=?
+    // SELECT id, category_id, count(*) as amount FROM table1 GROUP BY category_id HAVING category_id=? OR category_id=?
     wSQL.select("id, category_id, count(*) as amount")
         .from("table1")
         .group_by("category_id")
@@ -57,8 +57,7 @@ angular.module('sampleApp', [
             console.log(d);
         });
 
-
-    //SELECT id, category_id, count(*) as amount FROM table1 WHERE id=57 GROUP BY category_id HAVING category_id=10
+    // SELECT id, category_id, count(*) as amount FROM table1 WHERE id=57 GROUP BY category_id HAVING category_id=10
     wSQL.select("id, category_id, count(*) as amount")
         .from("table1")
         .where("id", 57)
@@ -69,8 +68,8 @@ angular.module('sampleApp', [
         .then(function(d){
             console.log(d);
         });
-//
-//    //INSERT INTO table1 (category_id) VALUES (?)
+
+    // INSERT INTO table1 (category_id) VALUES (?)
     wSQL.insert("table1", {
         category_id: rand(),
         category_name: "ttdasdas"
@@ -115,6 +114,7 @@ angular.module('sampleApp', [
             console.log(d);
         });
 
+    // DELETE FROM table1 WHERE id = ?
     wSQL.delete("table1")
         .where("id", 18)
         .query()
