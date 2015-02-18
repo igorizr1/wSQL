@@ -150,4 +150,85 @@ angular.module('sampleApp', [
         console.log(error);
     });
 
+    /**
+     * Like Queries
+     */
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "my_query")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "query", "before")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "my_", "after")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "y_quer", "both")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "%query", false)
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "s")
+        .and_like("test_field", "field4", "before")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "s")
+        .like("test_field", "field4", "before")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "s")
+        .or_like("test_field", "field4", "before")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .where("test_field", "test_field4")
+        .like("category_name", "s")
+        .or_like("test_field", "field4", "before")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
 });

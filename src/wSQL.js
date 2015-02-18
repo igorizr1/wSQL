@@ -174,6 +174,7 @@ angular.module('wSQL', [
         function CoreQueryBuilder(){
             this._sql = "";
             this._query_data = [];
+            this._where_flag = false;
         }
 
         CoreQueryBuilder.prototype.select = function(select){
@@ -205,7 +206,46 @@ angular.module('wSQL', [
         };
 
         CoreQueryBuilder.prototype.where = function(operator1, operator2, comparator){
-            return this._where_query("WHERE", operator1, operator2, comparator);
+            this._where_query(this._where_flag ? "AND" : "WHERE", operator1, operator2, comparator);
+            this._where_flag = true;
+            return this._sql;
+        };
+
+        CoreQueryBuilder.prototype._like_query = function(type, operator1, operator2, position){
+            var like = "%"+operator2+"%";
+            switch(position){
+                case "before":
+                    like = "%"+operator2;
+                    break;
+                case "after":
+                    like = operator2+"%";
+                    break;
+                case "both":
+                    like = "%"+operator2+"%";
+                    break;
+                case false:
+                    like = operator2;
+                    break;
+                default:
+                    like = "%"+operator2+"%";
+                    break;
+                }
+            this._query_data.push(like);
+            return this._sql+= " "+type+" "+operator1+ " LIKE ?";
+        };
+
+        CoreQueryBuilder.prototype.like = function(operator1, operator2, position){
+            this._like_query(this._where_flag ? "AND" : "WHERE", operator1, operator2, position);
+            this._where_flag = true;
+            return this._sql;
+        };
+
+        CoreQueryBuilder.prototype.or_like = function(operator1, operator2, position){
+            return this._like_query("OR", operator1, operator2, position);
+        };
+
+        CoreQueryBuilder.prototype.and_like = function(operator1, operator2, position){
+            return this.like(operator1, operator2, position);
         };
 
         CoreQueryBuilder.prototype.or = function(operator1, operator2, comparator){
@@ -306,21 +346,25 @@ angular.module('wSQL', [
                     set: function(){return _this.set.apply(_this, arguments);},
                     where: function(){return _this.where.apply(_this, arguments);},
                     where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    like: function(){return _this.like.apply(_this, arguments);},
                     query: function(){return _this.query.apply(_this, arguments);}
                 },
                 set: {
                     where: function(){return _this.where.apply(_this, arguments);},
                     where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    like: function(){return _this.like.apply(_this, arguments);},
                     query: function(){return _this.query.apply(_this, arguments);}
                 },
                 'delete': {
                     where: function(){return _this.where.apply(_this, arguments);},
                     where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    like: function(){return _this.like.apply(_this, arguments);},
                     query: function(){return _this.query.apply(_this, arguments);}
                 },
                 from: {
                     where: function(){return _this.where.apply(_this, arguments);},
                     where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    like: function(){return _this.like.apply(_this, arguments);},
                     join: function(){return _this.join.apply(_this, arguments);},
                     left_join: function(){return _this.left_join.apply(_this, arguments);},
                     order_by: function(){return _this.order_by.apply(_this, arguments);},
@@ -330,11 +374,16 @@ angular.module('wSQL', [
                     row: function(){return _this.row.apply(_this, arguments);},
                     col: function(){return _this.col.apply(_this, arguments);}
                 },
+                // where & like & or & and
                 where: {
+                    where: function(){return _this.where.apply(_this, arguments);},
                     and: function(){return _this.and.apply(_this, arguments);},
                     or: function(){return _this.or.apply(_this, arguments);},
                     and_in: function(){return _this.and_in.apply(_this, arguments);},
                     or_in: function(){return _this.or_in.apply(_this, arguments);},
+                    like: function(){return _this.like.apply(_this, arguments);},
+                    and_like: function(){return _this.and_like.apply(_this, arguments);},
+                    or_like: function(){return _this.or_like.apply(_this, arguments);},
                     order_by: function(){return _this.order_by.apply(_this, arguments);},
                     group_by: function(){return _this.group_by.apply(_this, arguments);},
                     limit: function(){return _this.limit.apply(_this, arguments);},
@@ -345,6 +394,7 @@ angular.module('wSQL', [
                 join: {
                     where: function(){return _this.where.apply(_this, arguments);},
                     where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    like: function(){return _this.like.apply(_this, arguments);},
                     join: function(){return _this.join.apply(_this, arguments);},
                     left_join: function(){return _this.left_join.apply(_this, arguments);},
                     order_by: function(){return _this.order_by.apply(_this, arguments);},
@@ -375,6 +425,8 @@ angular.module('wSQL', [
                     or: function(){return _this.or.apply(_this, arguments);},
                     and_in: function(){return _this.and_in.apply(_this, arguments);},
                     or_in: function(){return _this.or_in.apply(_this, arguments);},
+                    and_like: function(){return _this.and_like.apply(_this, arguments);},
+                    or_like: function(){return _this.or_like.apply(_this, arguments);},
                     order_by: function(){return _this.order_by.apply(_this, arguments);},
                     limit: function(){return _this.limit.apply(_this, arguments);},
                     query: function(){return _this.query.apply(_this, arguments);},
@@ -394,6 +446,9 @@ angular.module('wSQL', [
                 case 'and_in':
                 case 'or':
                 case 'or_in':
+                case 'like':
+                case 'and_like':
+                case 'or_like':
                     response_type = "where";
                     break;
                 default:
@@ -414,6 +469,9 @@ angular.module('wSQL', [
         QueryBuilder.prototype.and = function(){return this.__perform("and", arguments);};
         QueryBuilder.prototype.or_in = function(){return this.__perform("or_in", arguments);};
         QueryBuilder.prototype.and_in = function(){return this.__perform("and_in", arguments);};
+        QueryBuilder.prototype.like = function(){return this.__perform("like", arguments);};
+        QueryBuilder.prototype.or_like = function(){return this.__perform("or_like", arguments);};
+        QueryBuilder.prototype.and_like = function(){return this.__perform("and_like", arguments);};
         QueryBuilder.prototype.join = function(){return this.__perform("join", arguments);};
         QueryBuilder.prototype.left_join = function(){return this.__perform("join", arguments);};
         QueryBuilder.prototype.order_by = function(){return this.__perform("order_by", arguments);};
@@ -429,6 +487,9 @@ angular.module('wSQL', [
     , API = {
         /**
          * Stuff to add:
+         *  - where not in, and not in or not in
+         *  - or_having
+         *  - or & and without params for putting word AND or OR before HAVING and LIKE etc
          *  - tests
          *  - validation
          *  - insert_or_ignore
