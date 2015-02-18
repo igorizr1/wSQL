@@ -2,19 +2,19 @@
 wSQL - angularJS active record module for WebSQLite database - database in the browser. U can persist your data for your PhoneGap HTML5 applications build with ionic or angular. Good solution for mobile applications with offline mode.
 
 ### install from bower
-bower install w-sql
+bower install angular-wsql
 
 ### A sample of config file(u need to set your DB schema there) can be found in this repo at src/wSQL.db.config.js (just cope it in your project)
 
 ### methods:
-* wSQL.select...
-* wSQL.insert...
-* wSQL.batch_insert...
-* wSQL.update...
-* wSQL.delete...
+* wSQL.select()
+* wSQL.insert(table_name, data)
+* wSQL.batch_insert(table_name, data)
+* wSQL.update(table_name, data)
+* wSQL.delete(table_name)
 
 ### optionally u can perform query directly with passing SQL
-* wSQL.query...
+* wSQL.query(custom_sql)
 
 ### optionally u can perform queries upon tables
 * wSQL.create_table(table_name, table_fields)
@@ -47,6 +47,7 @@ bower install w-sql
 * join
 * left_join
 * having
+* set
 * group_by
 * order_by
 * limit //limit also does offset as a second argument
@@ -60,8 +61,6 @@ angular.module('sampleApp', [
     "wSQL.db"
 ])
 .controller('SampleController', function($scope, wSQL) {
-
-    console.log(wSQL);
 
     // SELECT id, category_id FROM table1 WHERE id=? LIMIT 1
     wSQL.select("id, category_id")
@@ -174,6 +173,114 @@ angular.module('sampleApp', [
         .query()
         .then(function(data){
             console.log(data);
+        });
+
+    /**
+     * Direct Queries
+     * (better to use ORM stuff)
+      */
+    // Simple direct query
+    wSQL.query("SELECT * FROM table1").then(function(result){
+        console.log(result);
+    });
+
+    // Direct Query with params in SQL
+    wSQL.query("SELECT * FROM table1 WHERE id IN (1,5)").then(function(result){
+        console.log(result);
+    });
+
+    // Pass query params in second argument to avoid escape errors
+    wSQL.query("SELECT * FROM table1 WHERE category_name=?", ["'♥,♥,|'♥,♥,♥'"]).then(function(result){
+        console.log(result);
+    });
+
+    // Or u can get error
+    wSQL.query("SELECT * FROM table1 WHERE category_name= '♥,♥,|'♥,♥,♥'").then(function(result){
+        console.log(result);
+    }, function(error){
+        console.log("___error");
+        console.log(error);
+    });
+
+    /**
+     * Like Queries
+     */
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "my_query")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "query", "before")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "my_", "after")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "y_quer", "both")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "%query", false)
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "s")
+        .and_like("test_field", "field4", "before")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "s")
+        .like("test_field", "field4", "before")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .like("category_name", "s")
+        .or_like("test_field", "field4", "before")
+        .query()
+        .then(function(d){
+            console.log(d);
+        });
+
+    wSQL.select()
+        .from("table1")
+        .where("test_field", "test_field4")
+        .like("category_name", "s")
+        .or_like("test_field", "field4", "before")
+        .query()
+        .then(function(d){
+            console.log(d);
         });
 
 });
