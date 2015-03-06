@@ -104,6 +104,34 @@ angular.module('sampleApp', [
         console.log("insert_id");
         console.log(insert.insertId);
     });
+    
+    
+    // INSERT OR IGNORE INTO table1 (category_id,category_name,test_field) SELECT ? as category_id,? as category_name,? as test_field UNION SELECT ?,?,? UNION SELECT ?,?,? UNION SELECT ?,?,?
+    wSQL.batch_insert("table1", [
+        {
+            category_id: rand(),
+            category_name: "ttdasdas1",
+            test_field: "test_field1"
+        },
+        {
+            category_id: rand(),
+            category_name: "ttdasdas2",
+            test_field: "test_field2"
+        },
+        {
+            category_id: rand(),
+            category_name: "ttdasdas3",
+            test_field: "test_field3"
+        },
+        {
+            category_id: rand(),
+            category_name: "ttdasdas4",
+            test_field: "test_field4"
+        }
+    ],true).then(function(insert){
+        console.log("insert_id");
+        console.log(insert.insertId);
+    });
 
     // UPDATE table1 SET category_id=? WHERE id=?
     wSQL.update("table1", {category_id: 6})

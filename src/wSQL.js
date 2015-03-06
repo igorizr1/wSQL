@@ -155,8 +155,8 @@ angular.module('wSQL', [
             sql = 'INSERT INTO '+ table +' ('+ object_sql.keys +') VALUES ('+ object_sql.query + ')';
             return new ExecuteSql().query(sql, object_sql.values);
         };
-        InsertQuery.prototype.batch_insert = function(table, data){
-            var sql = 'INSERT INTO ' + table + ' ('+object_to_sql(data[0]).keys+')', sql_values = [];
+        InsertQuery.prototype.batch_insert = function(table, data, ignore){
+            var sql = 'INSERT' + ignore ? 'OR IGNORE ': '' +'INTO ' + table + ' (' + object_to_sql(data[0]).keys + ')', sql_values = [];
             data.forEach(function(row, k){
                 var row_sql = object_to_sql(row);
                 sql_values = sql_values.concat(row_sql.values);
@@ -493,7 +493,6 @@ angular.module('wSQL', [
          *  - tests
          *  - validation
          *  - insert_or_ignore
-         *  - batch_insert_or_ignore
          *  - replace
          *  - batch_replace
          *  - insert_on_duplicate_key_update
@@ -508,12 +507,15 @@ angular.module('wSQL', [
         insert: function(table, values) {
             return new InsertQuery().insert(table, values);
         },
-        batch_insert: function(table, values){
+        batch_insert: function(table, values, ignore){
             if (typeof table != "string")
                 return false; // table is a string not an array
             if (values instanceof Array === false)
                 return false; // data is array here
-            return new InsertQuery().batch_insert(table, values);
+            return new InsertQuery().batch_insert(table, values, ignore);
+        },
+        batch_insert_or_ignore: function(table, values){
+            return this.batch_insert(table, values, true);
         },
         delete: function(table){
             return new QueryBuilder().delete(table);
