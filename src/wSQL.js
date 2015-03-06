@@ -156,7 +156,7 @@ angular.module('wSQL', [
             return new ExecuteSql().query(sql, object_sql.values);
         };
         InsertQuery.prototype.batch_insert = function(table, data, ignore){
-            var sql = 'INSERT' + ignore ? 'OR IGNORE ': '' +'INTO ' + table + ' (' + object_to_sql(data[0]).keys + ')', sql_values = [];
+            var sql = 'INSERT' + (ignore ? ' OR IGNORE' : '') +' INTO ' + table + ' (' + object_to_sql(data[0]).keys + ')', sql_values = [];
             data.forEach(function(row, k){
                 var row_sql = object_to_sql(row);
                 sql_values = sql_values.concat(row_sql.values);
