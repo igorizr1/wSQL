@@ -95,7 +95,8 @@ angular.module('wSQL', [
             console.debug("querySuccess");
             try{
                 results.insertId;
-                return callback( JSON.parse(JSON.stringify( results )) );
+                // return callback( JSON.parse(JSON.stringify( results )) );
+				return callback( {insertId: results.insertId} );
             }catch(e){
                 var len = results.rows.length, db_result = [];
                 if(results.rows.length > 0)
