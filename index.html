@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Wsql by igorizr1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Wsql</h1>
+      <h2 class="project-tagline">wSQL - angularJS active record module for WebSQLite database - database in the browser. U can persist your data for your PhoneGap HTML5 applications build with ionic or angular. Good solution for mobile applications with offline mode.</h2>
+      <a href="https://github.com/igorizr1/wSQL" class="btn">View on GitHub</a>
+      <a href="https://github.com/igorizr1/wSQL/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/igorizr1/wSQL/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="wsql" class="anchor" href="#wsql" aria-hidden="true"><span class="octicon octicon-link"></span></a>wSQL</h1>
+
+<p>wSQL - angularJS active record module for WebSQLite database - database in the browser. U can persist your data for your PhoneGap HTML5 applications build with ionic or angular. Good solution for mobile applications with offline mode.</p>
+
+<h3>
+<a id="install-from-bower" class="anchor" href="#install-from-bower" aria-hidden="true"><span class="octicon octicon-link"></span></a>install from bower</h3>
+
+<p>bower install angular-wsql</p>
+
+<h3>
+<a id="a-sample-of-config-fileu-need-to-set-your-db-schema-there-can-be-found-in-this-repo-at-srcwsqldbconfigjs-just-cope-it-in-your-project" class="anchor" href="#a-sample-of-config-fileu-need-to-set-your-db-schema-there-can-be-found-in-this-repo-at-srcwsqldbconfigjs-just-cope-it-in-your-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>A sample of config file(u need to set your DB schema there) can be found in this repo at src/wSQL.db.config.js (just cope it in your project)</h3>
+
+<h3>
+<a id="methods" class="anchor" href="#methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>methods:</h3>
+
+<ul>
+<li>wSQL.select()</li>
+<li>wSQL.insert(table_name, data)</li>
+<li>wSQL.batch_insert(table_name, data)</li>
+<li>wSQL.update(table_name, data)</li>
+<li>wSQL.delete(table_name)</li>
+</ul>
+
+<h3>
+<a id="optionally-u-can-perform-query-directly-with-passing-sql" class="anchor" href="#optionally-u-can-perform-query-directly-with-passing-sql" aria-hidden="true"><span class="octicon octicon-link"></span></a>optionally u can perform query directly with passing SQL</h3>
+
+<ul>
+<li>wSQL.query(custom_sql)</li>
+</ul>
+
+<h3>
+<a id="optionally-u-can-perform-queries-upon-tables" class="anchor" href="#optionally-u-can-perform-queries-upon-tables" aria-hidden="true"><span class="octicon octicon-link"></span></a>optionally u can perform queries upon tables</h3>
+
+<ul>
+<li>wSQL.create_table(table_name, table_fields)</li>
+<li>wSQL.drop_table(table_name)</li>
+</ul>
+
+<h3>
+<a id="methods-to-query-request-and-generate-results-all-return-promises" class="anchor" href="#methods-to-query-request-and-generate-results-all-return-promises" aria-hidden="true"><span class="octicon octicon-link"></span></a>methods to query request and generate results (all return promises):</h3>
+
+<ul>
+<li>query - get all results</li>
+<li>row   - get one row</li>
+<li>col   - get one column</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>
+    ...
+    .query().then(<span class="pl-k">function</span>(<span class="pl-smi">result</span>){
+        <span class="pl-c">// query returns promise</span>
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(result);
+    }, <span class="pl-k">function</span>(<span class="pl-smi">error</span>){
+        <span class="pl-c">// error result</span>
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(error);
+    })
+</pre></div>
+
+<h3>
+<a id="list-of-query-modifiers" class="anchor" href="#list-of-query-modifiers" aria-hidden="true"><span class="octicon octicon-link"></span></a>list of query modifiers:</h3>
+
+<ul>
+<li>where</li>
+<li>where_in</li>
+<li>and</li>
+<li>and_in</li>
+<li>or</li>
+<li>or_in</li>
+<li>join</li>
+<li>left_join</li>
+<li>having</li>
+<li>set</li>
+<li>group_by</li>
+<li>order_by</li>
+<li>limit //limit also does offset as a second argument</li>
+</ul>
+
+<h2>
+<a id="no-full-doc-yet-but-samples-below----pretty-simple" class="anchor" href="#no-full-doc-yet-but-samples-below----pretty-simple" aria-hidden="true"><span class="octicon octicon-link"></span></a>no full DOC yet but samples below -- pretty simple</h2>
+
+<h2>
+<a id="also-examples-can-be-found-in-examplesexample1" class="anchor" href="#also-examples-can-be-found-in-examplesexample1" aria-hidden="true"><span class="octicon octicon-link"></span></a>also examples can be found in examples/example1</h2>
+
+<div class="highlight highlight-javascript"><pre>angular.module(<span class="pl-s"><span class="pl-pds">'</span>sampleApp<span class="pl-pds">'</span></span>, [
+    <span class="pl-s"><span class="pl-pds">"</span>wSQL.db<span class="pl-pds">"</span></span>
+])
+.controller(<span class="pl-s"><span class="pl-pds">'</span>SampleController<span class="pl-pds">'</span></span>, <span class="pl-k">function</span>(<span class="pl-smi">$scope</span>, <span class="pl-smi">wSQL</span>) {
+
+    <span class="pl-c">// SELECT id, category_id FROM table1 WHERE id=? LIMIT 1</span>
+    wSQL.<span class="pl-c1">select</span>(<span class="pl-s"><span class="pl-pds">"</span>id, category_id<span class="pl-pds">"</span></span>)
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .where(<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>, <span class="pl-c1">3</span>)
+        .col()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    <span class="pl-c">// SELECT * FROM table1 WHERE id&gt;? AND category_id=? OR category_id=? LIMIT 1</span>
+    wSQL.<span class="pl-c1">select</span>(<span class="pl-s"><span class="pl-pds">"</span>*<span class="pl-pds">"</span></span>)
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .where(<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>, <span class="pl-c1">3</span>, <span class="pl-s"><span class="pl-pds">"</span>&gt;<span class="pl-pds">"</span></span>)
+        .and(<span class="pl-s"><span class="pl-pds">"</span>category_id<span class="pl-pds">"</span></span>, <span class="pl-c1">15</span>)
+        .or(<span class="pl-s"><span class="pl-pds">"</span>category_id<span class="pl-pds">"</span></span>, <span class="pl-c1">14</span>)
+        .row()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    <span class="pl-c">// SELECT * FROM table1 WHERE id IN (?, ?, ?)</span>
+    wSQL.<span class="pl-c1">select</span>()
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .where_in(<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>, [<span class="pl-c1">3</span>,<span class="pl-c1">4</span>,<span class="pl-c1">6</span>])
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    <span class="pl-c">// SELECT id, category_id, count(*) as amount FROM table1 GROUP BY category_id</span>
+    wSQL.<span class="pl-c1">select</span>(<span class="pl-s"><span class="pl-pds">"</span>id, category_id, count(*) as amount<span class="pl-pds">"</span></span>)
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .group_by(<span class="pl-s"><span class="pl-pds">"</span>category_id<span class="pl-pds">"</span></span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    <span class="pl-c">// SELECT id, category_id, count(*) as amount FROM table1 GROUP BY category_id HAVING category_id=? OR category_id=?</span>
+    wSQL.<span class="pl-c1">select</span>(<span class="pl-s"><span class="pl-pds">"</span>id, category_id, count(*) as amount<span class="pl-pds">"</span></span>)
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .group_by(<span class="pl-s"><span class="pl-pds">"</span>category_id<span class="pl-pds">"</span></span>)
+        .having(<span class="pl-s"><span class="pl-pds">"</span>category_id<span class="pl-pds">"</span></span>, <span class="pl-c1">15</span>)
+        .or(<span class="pl-s"><span class="pl-pds">"</span>category_id<span class="pl-pds">"</span></span>, <span class="pl-c1">10</span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+
+    <span class="pl-c">// SELECT id, category_id, count(*) as amount FROM table1 WHERE id=57 GROUP BY category_id HAVING category_id=10</span>
+    wSQL.<span class="pl-c1">select</span>(<span class="pl-s"><span class="pl-pds">"</span>id, category_id, count(*) as amount<span class="pl-pds">"</span></span>)
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .where(<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>, <span class="pl-c1">57</span>)
+        .group_by(<span class="pl-s"><span class="pl-pds">"</span>category_id<span class="pl-pds">"</span></span>)
+        .having(<span class="pl-s"><span class="pl-pds">"</span>category_id<span class="pl-pds">"</span></span>, <span class="pl-c1">10</span>)
+        .or(<span class="pl-s"><span class="pl-pds">"</span>category_id<span class="pl-pds">"</span></span>, <span class="pl-c1">15</span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    <span class="pl-c">// INSERT INTO table1 (category_id) VALUES (?)</span>
+    wSQL.insert(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>, {
+        category_id<span class="pl-k">:</span> <span class="pl-c1">14</span>
+    }).then(<span class="pl-k">function</span>(<span class="pl-smi">insert</span>){
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">"</span>insert_id<span class="pl-pds">"</span></span>);
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(insert.insertId);
+    });
+
+    <span class="pl-c">// INSERT OR IGNORE INTO table1 (category_id,category_name,test_field) SELECT ? as category_id,? as category_name,? as test_field UNION SELECT ?,?,? UNION SELECT ?,?,? UNION SELECT ?,?,?</span>
+    wSQL.batch_insert_or_ignore(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>, [
+        {
+            category_id<span class="pl-k">:</span> rand(),
+            category_name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ttdasdas1<span class="pl-pds">"</span></span>,
+            test_field<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_field1<span class="pl-pds">"</span></span>
+        },
+        {
+            category_id<span class="pl-k">:</span> rand(),
+            category_name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ttdasdas2<span class="pl-pds">"</span></span>,
+            test_field<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_field2<span class="pl-pds">"</span></span>
+        },
+        {
+            category_id<span class="pl-k">:</span> rand(),
+            category_name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ttdasdas3<span class="pl-pds">"</span></span>,
+            test_field<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_field3<span class="pl-pds">"</span></span>
+        },
+        {
+            category_id<span class="pl-k">:</span> rand(),
+            category_name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ttdasdas4<span class="pl-pds">"</span></span>,
+            test_field<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_field4<span class="pl-pds">"</span></span>
+        }
+    ]).then(<span class="pl-k">function</span>(<span class="pl-smi">insert</span>){
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">"</span>insert_id<span class="pl-pds">"</span></span>);
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(insert.insertId);
+    });
+
+    <span class="pl-c">// INSERT INTO table1 (category_id,category_name,test_field) SELECT ? as category_id,? as category_name,? as test_field UNION SELECT ?,?,? UNION SELECT ?,?,? UNION SELECT ?,?,?</span>
+    wSQL.batch_insert(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>, [
+        {
+            category_id<span class="pl-k">:</span> <span class="pl-c1">1</span>,
+            category_name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ttdasdas1<span class="pl-pds">"</span></span>,
+            test_field<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_field1<span class="pl-pds">"</span></span>
+        },
+        {
+            category_id<span class="pl-k">:</span> <span class="pl-c1">2</span>,
+            category_name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ttdasdas2<span class="pl-pds">"</span></span>,
+            test_field<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_field2<span class="pl-pds">"</span></span>
+        },
+        {
+            category_id<span class="pl-k">:</span> <span class="pl-c1">3</span>,
+            category_name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ttdasdas3<span class="pl-pds">"</span></span>,
+            test_field<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_field3<span class="pl-pds">"</span></span>
+        },
+        {
+            category_id<span class="pl-k">:</span> <span class="pl-c1">10</span>,
+            category_name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ttdasdas4<span class="pl-pds">"</span></span>,
+            test_field<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_field4<span class="pl-pds">"</span></span>
+        }
+    ]).then(<span class="pl-k">function</span>(<span class="pl-smi">insert</span>){
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">"</span>insert_id<span class="pl-pds">"</span></span>);
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(insert.insertId);
+    });
+
+    <span class="pl-c">// INSERT OR IGNORE INTO table1 (category_id,category_name,test_field) SELECT ? as category_id,? as category_name,? as test_field UNION SELECT ?,?,? UNION SELECT ?,?,? UNION SELECT ?,?,?</span>
+    wSQL.batch_insert(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>, [
+        {
+            category_id<span class="pl-k">:</span> rand(),
+            category_name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ttdasdas1<span class="pl-pds">"</span></span>,
+            test_field<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_field1<span class="pl-pds">"</span></span>
+        },
+        {
+            category_id<span class="pl-k">:</span> rand(),
+            category_name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ttdasdas2<span class="pl-pds">"</span></span>,
+            test_field<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_field2<span class="pl-pds">"</span></span>
+        },
+        {
+            category_id<span class="pl-k">:</span> rand(),
+            category_name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ttdasdas3<span class="pl-pds">"</span></span>,
+            test_field<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_field3<span class="pl-pds">"</span></span>
+        },
+        {
+            category_id<span class="pl-k">:</span> rand(),
+            category_name<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>ttdasdas4<span class="pl-pds">"</span></span>,
+            test_field<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>test_field4<span class="pl-pds">"</span></span>
+        }
+    ],<span class="pl-c1">true</span>).then(<span class="pl-k">function</span>(<span class="pl-smi">insert</span>){
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">"</span>insert_id<span class="pl-pds">"</span></span>);
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(insert.insertId);
+    });
+
+
+    <span class="pl-c">// UPDATE table1 SET category_id=? WHERE id=?</span>
+    wSQL.update(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>, {category_id<span class="pl-k">:</span> <span class="pl-c1">6</span>})
+        .where(<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>, <span class="pl-c1">19</span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">result</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(result);
+        });
+
+    <span class="pl-c">// DELETE FROM table1 WHERE id = ?</span>
+    wSQL.delete(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .where(<span class="pl-s"><span class="pl-pds">"</span>id<span class="pl-pds">"</span></span>, <span class="pl-c1">18</span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">data</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(data);
+        });
+
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * Direct Queries</span>
+<span class="pl-c">     * (better to use ORM stuff)</span>
+<span class="pl-c">      */</span>
+    <span class="pl-c">// Simple direct query</span>
+    wSQL.query(<span class="pl-s"><span class="pl-pds">"</span>SELECT * FROM table1<span class="pl-pds">"</span></span>).then(<span class="pl-k">function</span>(<span class="pl-smi">result</span>){
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(result);
+    });
+
+    <span class="pl-c">// Direct Query with params in SQL</span>
+    wSQL.query(<span class="pl-s"><span class="pl-pds">"</span>SELECT * FROM table1 WHERE id IN (1,5)<span class="pl-pds">"</span></span>).then(<span class="pl-k">function</span>(<span class="pl-smi">result</span>){
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(result);
+    });
+
+    <span class="pl-c">// Pass query params in second argument to avoid escape errors</span>
+    wSQL.query(<span class="pl-s"><span class="pl-pds">"</span>SELECT * FROM table1 WHERE category_name=?<span class="pl-pds">"</span></span>, [<span class="pl-s"><span class="pl-pds">"</span>'♥,♥,|'♥,♥,♥'<span class="pl-pds">"</span></span>]).then(<span class="pl-k">function</span>(<span class="pl-smi">result</span>){
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(result);
+    });
+
+    <span class="pl-c">// Or u can get error</span>
+    wSQL.query(<span class="pl-s"><span class="pl-pds">"</span>SELECT * FROM table1 WHERE category_name= '♥,♥,|'♥,♥,♥'<span class="pl-pds">"</span></span>).then(<span class="pl-k">function</span>(<span class="pl-smi">result</span>){
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(result);
+    }, <span class="pl-k">function</span>(<span class="pl-smi">error</span>){
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(<span class="pl-s"><span class="pl-pds">"</span>___error<span class="pl-pds">"</span></span>);
+        <span class="pl-en">console</span><span class="pl-c1">.log</span>(error);
+    });
+
+    <span class="pl-c">/**</span>
+<span class="pl-c">     * Like Queries</span>
+<span class="pl-c">     */</span>
+
+    wSQL.<span class="pl-c1">select</span>()
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .like(<span class="pl-s"><span class="pl-pds">"</span>category_name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>my_query<span class="pl-pds">"</span></span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    wSQL.<span class="pl-c1">select</span>()
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .like(<span class="pl-s"><span class="pl-pds">"</span>category_name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>query<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>before<span class="pl-pds">"</span></span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    wSQL.<span class="pl-c1">select</span>()
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .like(<span class="pl-s"><span class="pl-pds">"</span>category_name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>my_<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>after<span class="pl-pds">"</span></span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    wSQL.<span class="pl-c1">select</span>()
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .like(<span class="pl-s"><span class="pl-pds">"</span>category_name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>y_quer<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>both<span class="pl-pds">"</span></span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    wSQL.<span class="pl-c1">select</span>()
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .like(<span class="pl-s"><span class="pl-pds">"</span>category_name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>%query<span class="pl-pds">"</span></span>, <span class="pl-c1">false</span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    wSQL.<span class="pl-c1">select</span>()
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .like(<span class="pl-s"><span class="pl-pds">"</span>category_name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>s<span class="pl-pds">"</span></span>)
+        .and_like(<span class="pl-s"><span class="pl-pds">"</span>test_field<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>field4<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>before<span class="pl-pds">"</span></span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    wSQL.<span class="pl-c1">select</span>()
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .like(<span class="pl-s"><span class="pl-pds">"</span>category_name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>s<span class="pl-pds">"</span></span>)
+        .like(<span class="pl-s"><span class="pl-pds">"</span>test_field<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>field4<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>before<span class="pl-pds">"</span></span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    wSQL.<span class="pl-c1">select</span>()
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .like(<span class="pl-s"><span class="pl-pds">"</span>category_name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>s<span class="pl-pds">"</span></span>)
+        .or_like(<span class="pl-s"><span class="pl-pds">"</span>test_field<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>field4<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>before<span class="pl-pds">"</span></span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+    wSQL.<span class="pl-c1">select</span>()
+        .from(<span class="pl-s"><span class="pl-pds">"</span>table1<span class="pl-pds">"</span></span>)
+        .where(<span class="pl-s"><span class="pl-pds">"</span>test_field<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>test_field4<span class="pl-pds">"</span></span>)
+        .like(<span class="pl-s"><span class="pl-pds">"</span>category_name<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>s<span class="pl-pds">"</span></span>)
+        .or_like(<span class="pl-s"><span class="pl-pds">"</span>test_field<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>field4<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>before<span class="pl-pds">"</span></span>)
+        .query()
+        .then(<span class="pl-k">function</span>(<span class="pl-smi">d</span>){
+            <span class="pl-en">console</span><span class="pl-c1">.log</span>(d);
+        });
+
+});
+</pre></div>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/igorizr1/wSQL">Wsql</a> is maintained by <a href="https://github.com/igorizr1">igorizr1</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
