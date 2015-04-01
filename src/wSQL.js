@@ -148,14 +148,47 @@ angular.module('wSQL', [
     })()
 
     , InsertQuery = (function(){
+        var arguments_max_length = 900;
         function InsertQuery(){}
+        InsertQuery.prototype.slice_data = function(data){
+            var slices = [], splices_amount = Math.ceil(data.length/arguments_max_length);
+            for(var i = 0; i < splices_amount; i++){
+                slices.push(data.splice(0, arguments_max_length));
+            }
+            return slices;
+        };
+        InsertQuery.prototype.check_data_length = function(data){
+            return ( (data.length * Object.keys(data[0]).length) > arguments_max_length) ? this.slice_data(data) : false;
+        };
+
         InsertQuery.prototype.insert = function(table, data){
             var
             object_sql = object_to_sql(data),
             sql = 'INSERT INTO '+ table +' ('+ object_sql.keys +') VALUES ('+ object_sql.query + ')';
             return new ExecuteSql().query(sql, object_sql.values);
         };
-        InsertQuery.prototype.batch_insert = function(table, data, ignore){
+
+        InsertQuery.prototype.batch_insert_by_slice = function(table, data, ignore){
+            var deferred = $q.defer(), _this = this, queries = [];
+            data.forEach(function(slice){
+                queries.push(_this.batch_insert_query(table, slice, ignore));
+            });
+            $q.all(queries).then(function(result){
+                var _result = {insertIds: []};
+                result.forEach(function(v){
+                    if(_result.rowsAffected)
+                        _result.rowsAffected = _result.rowsAffected + v.rowsAffected;
+                    else
+                        _result.rowsAffected = v.rowsAffected;
+                    _result.insertId = v.insertId;
+                    _result.insertIds.push(v.insertId);
+                });
+                deferred.resolve(_result);
+            });
+            return deferred.promise;
+        };
+
+        InsertQuery.prototype.batch_insert_query = function(table, data, ignore){
             var sql = 'INSERT' + (ignore ? ' OR IGNORE' : '') +' INTO ' + table + ' (' + object_to_sql(data[0]).keys + ')', sql_values = [];
             data.forEach(function(row, k){
                 var row_sql = object_to_sql(row);
@@ -166,6 +199,14 @@ angular.module('wSQL', [
                     sql +=  ' UNION SELECT '+row_sql.query;
             });
             return new ExecuteSql().query(sql, sql_values);
+        };
+
+        InsertQuery.prototype.batch_insert = function(table, data, ignore){
+            var slice_result = this.check_data_length(data);
+            if(slice_result)
+                return this.batch_insert_by_slice(table, slice_result, ignore);
+            else
+                return this.batch_insert_query(table, data, ignore);
         };
         return InsertQuery;
     })()

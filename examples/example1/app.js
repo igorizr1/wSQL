@@ -99,6 +99,46 @@ angular.module('sampleApp', [
             category_id: rand(),
             category_name: "ttdasdas4",
             test_field: "test_field4"
+        },
+        {
+            category_id: rand(),
+            category_name: "ttdasdas1",
+            test_field: "test_field1"
+        },
+        {
+            category_id: rand(),
+            category_name: "ttdasdas2",
+            test_field: "test_field2"
+        },
+        {
+            category_id: rand(),
+            category_name: "ttdasdas3",
+            test_field: "test_field3"
+        },
+        {
+            category_id: rand(),
+            category_name: "ttdasdas4",
+            test_field: "test_field4"
+        },
+        {
+            category_id: rand(),
+            category_name: "ttdasdas1",
+            test_field: "test_field1"
+        },
+        {
+            category_id: rand(),
+            category_name: "ttdasdas2",
+            test_field: "test_field2"
+        },
+        {
+            category_id: rand(),
+            category_name: "ttdasdas3",
+            test_field: "test_field3"
+        },
+        {
+            category_id: rand(),
+            category_name: "ttdasdas4",
+            test_field: "test_field4"
         }
     ]).then(function(insert){
         console.log("insert_id");

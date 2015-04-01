@@ -21,6 +21,7 @@ var config = {
         //example 1
         './examples/example1/wSQL.config.js',
         './examples/example1/app.js'
+//        './examples/example1/batch_insert_sample.js'
     ],
     BOWER_SCRIPTS: [
         "./bower_components/angular/angular.min.js"
