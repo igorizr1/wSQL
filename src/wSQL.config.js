@@ -37,6 +37,15 @@ angular.module('wSQL.db.config', [])
             "testddd INTEGER NULL"
         ]
     },
+    /**
+     * DEBUG_LEVELs
+     *    0 - nothing
+     *    1 - console.error
+     *    2 - console.warn &
+     *    3 - console.info &
+     *    4 - console.log, debug
+     */
+    DEBUG_LEVEL: 0,
     CLEAR: true
 });
 

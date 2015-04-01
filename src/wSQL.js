@@ -27,6 +27,47 @@ angular.module('wSQL', [
             str += (k === 0 ? "?" : ", ?");
         });
         return str;
+    },
+    query_without_questions = function(sql, data){
+        return sql.replace(/\?/g, (function(){
+            var i = 0;
+            return function(match){
+                var res = data[i];
+                i++
+                return "'"+res+"'";
+            }
+        }()));
+    },
+    __if_debug_level = function(lvl){
+        return (W_SQL_CONFIG.DEBUG_LEVEL && W_SQL_CONFIG.DEBUG_LEVEL >= lvl);
+    },
+    if_debug = function(type){
+        /**
+         * DEBUG_LEVELs
+         *    0 - nothing
+         *    1 - console.error
+         *    2 - console.warn &
+         *    3 - console.info &
+         *    4 - console.log, console.debug
+         */
+        switch (type) {
+            case "error":
+                return __if_debug_level(1);
+                break;
+            case "warn":
+                return __if_debug_level(2);
+                break;
+            case "info":
+                return __if_debug_level(3);
+                break;
+            case "log":
+            case "debug":
+                return __if_debug_level(4);
+                break;
+            default:
+                return false;
+                break;
+        }
     };
 
     var Db = (function(){
@@ -66,13 +107,13 @@ angular.module('wSQL', [
          * }
          */
         if(!db_params.name || !db_params.version || !db_params.sub_name || !db_params.size || !tables_sql || Object.keys(tables_sql).length <= 0){
-            console.error("WebSQLite InitInterface error: initialize params are not specified");
+            if(if_debug("error"))console.error("WebSQLite InitInterface error: initialize params are not specified");
             return false;
         }
         Db.set(db_params);
 
         if(clear){
-            console.warn("DB was cleaned");
+            if(if_debug("warn"))console.warn("DB was cleaned");
             var drops = [];
             for(var t in tables_sql)
                 drops.push(new DropTableQuery().drop(t));
@@ -81,7 +122,7 @@ angular.module('wSQL', [
                     new CreateTableQuery().create(t, tables_sql[t]);
             });
         }else{
-            console.warn("DB was NOT cleaned");
+            if(if_debug("warn"))console.warn("DB was NOT cleaned");
             for(var t in tables_sql)
                 new CreateTableQuery().create(t, tables_sql[t])
         }
@@ -92,7 +133,7 @@ angular.module('wSQL', [
     , ExecuteSql = (function(){
         function ExecuteSql(){}
         ExecuteSql.prototype._querySuccess = function(tx, results, callback){
-            console.debug("querySuccess");
+            if(if_debug("debug"))console.debug("querySuccess");
             try{
                 results.insertId;
                 return callback( JSON.parse(JSON.stringify( results )) );
@@ -106,7 +147,8 @@ angular.module('wSQL', [
         };
         ExecuteSql.prototype._queryDB = function(tx, sql, data, callback) {
             var _this = this;
-            console.info(sql, data);
+//            console.info(sql, data);
+            if(if_debug("info"))console.info( query_without_questions(sql, data) );
             tx.executeSql(sql, data, function(tx, results){
                 _this._querySuccess(tx, results, callback);
             }, function(err){
@@ -114,8 +156,8 @@ angular.module('wSQL', [
             });
         };
         ExecuteSql.prototype._errorCB = function(err, sql, data, callback) {
-            console.error("Error processing SQL, error & sql below:");
-            console.error(err);
+            if(if_debug("error"))console.error("Error processing SQL, error & sql below:");
+            if(if_debug("error"))console.error(err);
             if(callback)callback({error:err});
         };
 
@@ -184,7 +226,7 @@ angular.module('wSQL', [
                     _result.insertIds.push(v.insertId);
                 });
                 deferred.resolve(_result);
-            });
+            }, deferred.reject);
             return deferred.promise;
         };
 
@@ -578,7 +620,7 @@ angular.module('wSQL', [
     if(W_SQL_CONFIG && W_SQL_CONFIG.PARAMS && W_SQL_CONFIG.TABLES_SQL)
         return InitInterface(W_SQL_CONFIG.PARAMS, W_SQL_CONFIG.TABLES_SQL, W_SQL_CONFIG.CLEAR);
     else{
-        console.error("wSQL.config is not correct");
+        if(if_debug("error"))console.error("wSQL.config is not correct");
         return false;
     }
 });
