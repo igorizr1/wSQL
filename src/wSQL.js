@@ -223,10 +223,6 @@ angular.module('wSQL', [
             $q.all(queries).then(function(result){
                 var _result = {insertIds: []};
                 result.forEach(function(v){
-//                    if(_result.rowsAffected)
-//                        _result.rowsAffected = _result.rowsAffected + v.rowsAffected;
-//                    else
-//                        _result.rowsAffected = v.rowsAffected;
                     _result.insertId = v.insertId;
                     _result.insertIds.push(v.insertId);
                 });
