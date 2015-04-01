@@ -32,8 +32,9 @@ angular.module('wSQL.config', [])
         "table1"    :   [
             "id INTEGER PRIMARY KEY AUTOINCREMENT NULL",
             "category_id INTEGER NULL",
-            "category_name VARCHAR(255) NOT NULL",
-            "test_field VARCHAR(255) NOT NULL",
+            "category_name VARCHAR(255) NULL",
+            "test_field VARCHAR(255) NULL",
+            "test_field2 VARCHAR(255) NULL",
             "date TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP"
         ],
         "table2"    :   [
@@ -41,6 +42,7 @@ angular.module('wSQL.config', [])
             "testddd INTEGER NULL"
         ]
     },
+    DEBUG_LEVEL: 4,
 //    CLEAR: true
 
 });

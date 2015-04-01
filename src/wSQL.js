@@ -193,9 +193,11 @@ angular.module('wSQL', [
         var arguments_max_length = 900;
         function InsertQuery(){}
         InsertQuery.prototype.slice_data = function(data){
-            var slices = [], splices_amount = Math.ceil(data.length/arguments_max_length);
-            for(var i = 0; i < splices_amount; i++){
-                slices.push(data.splice(0, arguments_max_length));
+            var slices = [],
+                slice_rows_amount = Math.floor( arguments_max_length / Object.keys(data[0]).length),
+                slices_amount = Math.ceil( data.length / slice_rows_amount );
+            for(var i = 0; i < slices_amount; i++){
+                slices.push(data.slice(i*slice_rows_amount, i*slice_rows_amount+slice_rows_amount));
             }
             return slices;
         };
@@ -211,6 +213,9 @@ angular.module('wSQL', [
         };
 
         InsertQuery.prototype.batch_insert_by_slice = function(table, data, ignore){
+
+            console.log("batch_insert_by_slice")
+
             var deferred = $q.defer(), _this = this, queries = [];
             data.forEach(function(slice){
                 queries.push(_this.batch_insert_query(table, slice, ignore));
@@ -245,6 +250,10 @@ angular.module('wSQL', [
 
         InsertQuery.prototype.batch_insert = function(table, data, ignore){
             var slice_result = this.check_data_length(data);
+
+            console.log("slice_result")
+            console.log(slice_result)
+
             if(slice_result)
                 return this.batch_insert_by_slice(table, slice_result, ignore);
             else

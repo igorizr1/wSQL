@@ -9,26 +9,7 @@ var gulp = require('gulp'),
     clean = require('gulp-clean'),
     coffee = require('gulp-coffee'),
 
-    example = 1;
-
-//var config = {
-//
-//    SRC_SCRIPTS: [
-//        '!./**/*_test.js',
-//
-//        "./src/wSQL.js"
-//    ],
-//    EXAMPLE_SCRIPTS: [
-//        //example 1
-//        './examples/example1/wSQL.config.js',
-//        './examples/example1/app.js'
-////        './examples/example1/batch_insert_sample.js'
-//    ],
-//    BOWER_SCRIPTS: [
-//        "./bower_components/angular/angular.min.js"
-//    ]
-//
-//};
+    example = 1; //default example
 
 var config = {
     example1: {
