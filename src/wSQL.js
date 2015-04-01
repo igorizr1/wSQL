@@ -136,7 +136,7 @@ angular.module('wSQL', [
             if(if_debug("debug"))console.debug("querySuccess");
             try{
                 results.insertId;
-                return callback( JSON.parse(JSON.stringify( results )) );
+                return callback( {insertId: results.insertId} );
             }catch(e){
                 var len = results.rows.length, db_result = [];
                 if(results.rows.length > 0)
@@ -223,10 +223,10 @@ angular.module('wSQL', [
             $q.all(queries).then(function(result){
                 var _result = {insertIds: []};
                 result.forEach(function(v){
-                    if(_result.rowsAffected)
-                        _result.rowsAffected = _result.rowsAffected + v.rowsAffected;
-                    else
-                        _result.rowsAffected = v.rowsAffected;
+//                    if(_result.rowsAffected)
+//                        _result.rowsAffected = _result.rowsAffected + v.rowsAffected;
+//                    else
+//                        _result.rowsAffected = v.rowsAffected;
                     _result.insertId = v.insertId;
                     _result.insertIds.push(v.insertId);
                 });
