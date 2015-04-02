@@ -153,7 +153,7 @@ gulp.task('set_example_3', function(){example = 3;});
  * run Examples START
  */
 gulp.task('default',  ['set_example_1', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
-gulp.task('example1', ['set_example_2', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
+gulp.task('example1', ['set_example_1', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
 gulp.task('example2', ['set_example_2', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
 gulp.task('example3', ['set_example_3', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
 
@@ -163,4 +163,11 @@ gulp.task('example3', ['set_example_3', 'scripts_dev', 'copy_index', 'vendorBOWE
  * RUN SCRIPT TO MINIFY LIBRARY
  */
 gulp.task('dist',   ['scripts_min_prod']);
+
+/**
+ * BAmboo tests
+ */
+
+gulp.task('bamboo-example2', ['set_example_2', 'scripts_dev', 'copy_index', 'vendorBOWER']);
+
 
