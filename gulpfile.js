@@ -9,33 +9,38 @@ var gulp = require('gulp'),
     clean = require('gulp-clean'),
     coffee = require('gulp-coffee'),
 
-    example = 1; //default example
+//    example = 1; //default example
+    example = "example1"; //default example
 
 var config = {
-    example1: {
-        EXAMPLE_SCRIPTS: [
-            './examples/example1/wSQL.config.js',
-            './examples/example1/app.js'
-        ]
-    },
-    example2: {
-        EXAMPLE_SCRIPTS: [
-            './examples/example2/wSQL.config.js',
-            './examples/example2/app.js'
-        ]
-    },
-    example3: {
-        EXAMPLE_SCRIPTS: [
-            './examples/example3/wSQL.config.js',
-            './examples/example3/batch_insert_sample.js'
-        ]
-    },
-    example4: {
-        EXAMPLE_SCRIPTS: [
-            './examples/example4/wSQL.config.js',
-            './examples/example4/app.js'
-        ]
-    },
+    EXAMPLE_SCRIPTS: [
+        "wSQL.config.js",
+        "app.js"
+    ],
+//    example1: {
+//        EXAMPLE_SCRIPTS: [
+//            './examples/example1/wSQL.config.js',
+//            './examples/example1/app.js'
+//        ]
+//    },
+//    example2: {
+//        EXAMPLE_SCRIPTS: [
+//            './examples/example2/wSQL.config.js',
+//            './examples/example2/app.js'
+//        ]
+//    },
+//    example3: {
+//        EXAMPLE_SCRIPTS: [
+//            './examples/example3/wSQL.config.js',
+//            './examples/example3/batch_insert_sample.js'
+//        ]
+//    },
+//    example4: {
+//        EXAMPLE_SCRIPTS: [
+//            './examples/example4/wSQL.config.js',
+//            './examples/example4/app.js'
+//        ]
+//    },
     SRC_SCRIPTS: [
         '!./**/*_test.js',
         "./src/wSQL.js"
@@ -56,7 +61,11 @@ gulp.task('scripts_min_prod', function () {
 });
 
 gulp.task('scripts_min', function () {
-    gulp.src(config["example"+example].EXAMPLE_SCRIPTS)
+    var file_paths = config.EXAMPLE_SCRIPTS.map(function(v){
+        return './examples/'+example+"/"+v;
+    });
+
+    gulp.src(file_paths)
         .pipe(sourcemaps.init())
         .pipe(concat('app.min.js'))
         .pipe(ngAnnotate())
@@ -90,8 +99,11 @@ gulp.task('scripts_min', function () {
 gulp.task('scripts_dev', function () {
 
     console.log("running____________example__________", example);
-
-    gulp.src(config["example"+example].EXAMPLE_SCRIPTS)
+    var file_paths = config.EXAMPLE_SCRIPTS.map(function(v){
+        return './examples/'+example+"/"+v;
+    });
+//    gulp.src(config["example"+example].EXAMPLE_SCRIPTS)
+    gulp.src(file_paths)
         .pipe(sourcemaps.init())
         .pipe(concat('app.min.js'))
         .pipe(sourcemaps.write())
@@ -151,10 +163,16 @@ gulp.task('clean', function () {
     return gulp.src('./dev', {read: false}).pipe(clean({force: true}));
 });
 
-gulp.task('set_example_1', function(){example = 1;});
-gulp.task('set_example_2', function(){example = 2;});
-gulp.task('set_example_3', function(){example = 3;});
-gulp.task('set_example_4', function(){example = 4;});
+//gulp.task('set_example_1', function(){example = 1;});
+//gulp.task('set_example_2', function(){example = 2;});
+//gulp.task('set_example_3', function(){example = 3;});
+//gulp.task('set_example_4', function(){example = 4;});
+
+gulp.task('set_example_1', function(){example = "example1";});
+gulp.task('set_example_2', function(){example = "example2";});
+gulp.task('set_example_3', function(){example = "example3";});
+gulp.task('set_example_4', function(){example = "example4";});
+gulp.task('set_example_5', function(){example = "example5";});
 
 /**
  * run Examples START
@@ -164,6 +182,7 @@ gulp.task('example1', ['set_example_2', 'scripts_dev', 'copy_index', 'vendorBOWE
 gulp.task('example2', ['set_example_2', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
 gulp.task('example3', ['set_example_3', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
 gulp.task('example4', ['set_example_4', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
+gulp.task('example5', ['set_example_5', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
 
 //gulp.task('build',   ['scripts_min', 'copy_index', 'vendorBOWER', 'connect']);
 

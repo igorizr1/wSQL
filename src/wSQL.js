@@ -38,6 +38,14 @@ angular.module('wSQL', [
             }
         }()));
     },
+    fetch_keys = function(row, keys){
+        var result = {};
+        for(var i in row){
+            if( keys.indexOf(i) >= 0 )
+                result[i] = row[i];
+        }
+        return result;
+    },
     __if_debug_level = function(lvl){
         return (W_SQL_CONFIG.DEBUG_LEVEL && W_SQL_CONFIG.DEBUG_LEVEL >= lvl);
     },
@@ -205,17 +213,18 @@ angular.module('wSQL', [
             return ( (data.length * Object.keys(data[0]).length) > arguments_max_length) ? this.slice_data(data) : false;
         };
 
-        InsertQuery.prototype.insert = function(table, data){
+        InsertQuery.prototype.insert = function(table, data, ignore){
             var
             object_sql = object_to_sql(data),
-            sql = 'INSERT INTO '+ table +' ('+ object_sql.keys +') VALUES ('+ object_sql.query + ')';
+            sql = 'INSERT '+ (ignore ? 'OR IGNORE ': '') +'INTO '+ table +' ('+ object_sql.keys +') VALUES ('+ object_sql.query + ')';
             return new ExecuteSql().query(sql, object_sql.values);
         };
 
+        InsertQuery.prototype.insert_or_ignore = function(table, data){
+            return this.insert(table, data, true);
+        };
+
         InsertQuery.prototype.batch_insert_by_slice = function(table, data, ignore){
-
-            console.log("batch_insert_by_slice")
-
             var deferred = $q.defer(), _this = this, queries = [];
             data.forEach(function(slice){
                 queries.push(_this.batch_insert_query(table, slice, ignore));
@@ -605,16 +614,34 @@ angular.module('wSQL', [
     , API = {
         /**
          * Stuff to add:
-         *  - where not in, and not in or not in
          *  - or_having
          *  - or & and without params for putting word AND or OR before HAVING and LIKE etc
          *  - tests
          *  - validation
-         *  - insert_or_ignore
          *  - replace
          *  - batch_replace
-         *  - insert_on_duplicate_key_update
-         *  - batch_insert_on_duplicate_key_update
+         *  - where as object
+         *      where : {
+         *        id: 1,
+         *        test_field: {
+         *            value: "test_filed_value",
+         *            comparator: "!="
+         *        },
+         *        amount: {
+         *            comparator: ">",
+         *            value: 120
+         *        }
+         *      }
+         *
+         *  - where in inside where as an object
+         *      (probably not needed feature)
+         *     where: {
+         *          id: [1,2,3],
+         *          category_id: {
+         *              comparator: "!=", // NOT IN ....or....not
+         *              value: [1,2,3]
+         *          }
+         *     }
          */
         select: function(select){
             return new QueryBuilder().select(select);
@@ -622,8 +649,11 @@ angular.module('wSQL', [
         update: function(table, values){
             return new QueryBuilder().update(table, values);
         },
-        insert: function(table, values) {
-            return new InsertQuery().insert(table, values);
+        insert: function(table, values, ignore) {
+            return new InsertQuery().insert(table, values, ignore);
+        },
+        insert_or_ignore: function(table, values){
+            return this.insert(table, values, true);
         },
         batch_insert: function(table, values, ignore){
             if (typeof table != "string")
@@ -634,6 +664,26 @@ angular.module('wSQL', [
         },
         batch_insert_or_ignore: function(table, values){
             return this.batch_insert(table, values, true);
+        },
+        batch_insert_on_duplicate_key_update: function(table, values, unique_keys){
+            var _all = [], _this = this;
+            _all.push( this.batch_insert_or_ignore(table, values) );
+            values.forEach(function(v){
+                var _q_update = _this.update(table, v), _keys = fetch_keys(v, unique_keys);
+                for(var i in _keys)
+                    _q_update.where(i, _keys[i]);
+                _all.push( _q_update.query() );
+            });
+            return $q.all(_all);
+        },
+        insert_on_duplicate_key_update: function(table, row, unique_keys){
+            var _q_update = this.update(table, row), _keys = fetch_keys(row, unique_keys);
+            for(var i in _keys)
+                _q_update.where(i, _keys[i]);
+            return $q.all([
+                this.insert_or_ignore(table, row),
+                _q_update.query()
+            ]);
         },
         delete: function(table){
             return new QueryBuilder().delete(table);
