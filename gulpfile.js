@@ -11,6 +11,9 @@ var gulp = require('gulp'),
 
     example = 1; //default example
 
+var gulp = require('gulp');
+var karma = require('karma').server;
+
 var config = {
     example1: {
         EXAMPLE_SCRIPTS: [
@@ -149,6 +152,19 @@ gulp.task('set_example_1', function(){example = 1;});
 gulp.task('set_example_2', function(){example = 2;});
 gulp.task('set_example_3', function(){example = 3;});
 
+
+/**
+ * TEST tasks
+ */
+gulp.task('test', function (done) {
+    karma.start({
+        configFile: __dirname + '/karma.conf.js',
+        singleRun: true
+    }, done);
+});
+
+
+
 /**
  * run Examples START
  */
@@ -165,7 +181,7 @@ gulp.task('example3', ['set_example_3', 'scripts_dev', 'copy_index', 'vendorBOWE
 gulp.task('dist',   ['scripts_min_prod']);
 
 /**
- * BAmboo tests
+ * Bamboo tests
  */
 
 gulp.task('bamboo-example2', ['set_example_2', 'scripts_dev', 'copy_index', 'vendorBOWER']);

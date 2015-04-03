@@ -344,21 +344,21 @@ angular.module('wSQL', [
             return this._where_query("AND", operator1, operator2, comparator);
         };
 
-        CoreQueryBuilder.prototype._where_in_query = function(type, field, values){
+        CoreQueryBuilder.prototype._where_in_query = function(type, field, values, not){
             this._query_data = this._query_data.concat(values);
             return this._sql += " "+type+" " + field+" IN ("+array_to_sql(values)+")";
         };
 
-        CoreQueryBuilder.prototype.where_in = function(field, values) {
-            return this._where_in_query("WHERE", field, values);
+        CoreQueryBuilder.prototype.where_in = function(field, values, not) {
+            return this._where_in_query("WHERE", field, values, not);
         };
 
-        CoreQueryBuilder.prototype.or_in = function(field, values){
+        CoreQueryBuilder.prototype.or_in = function(field, values, not){
             return this._where_in_query("OR", field, values);
         };
 
-        CoreQueryBuilder.prototype.and_in = function(field, values){
-            return this._where_in_query("AND", field, values);
+        CoreQueryBuilder.prototype.and_in = function(field, values, not){
+            return this._where_in_query("AND", field, values, not);
         };
 
         CoreQueryBuilder.prototype._join_query = function(type, table, field1, field2, comparator) {
@@ -530,6 +530,7 @@ angular.module('wSQL', [
             switch(query_type){
                 case 'where':
                 case 'where_in':
+                case 'where_not_in':
                 case 'and':
                 case 'and_in':
                 case 'or':
@@ -553,6 +554,7 @@ angular.module('wSQL', [
         QueryBuilder.prototype.from = function(){return this.__perform("from", arguments);};
         QueryBuilder.prototype.where = function(){return this.__perform("where", arguments);};
         QueryBuilder.prototype.where_in = function(){return this.__perform("where_in", arguments);};
+        QueryBuilder.prototype.where_not_in = function(){return this.__perform("where_not_in", arguments);};
         QueryBuilder.prototype.or = function(){return this.__perform("or", arguments);};
         QueryBuilder.prototype.and = function(){return this.__perform("and", arguments);};
         QueryBuilder.prototype.or_in = function(){return this.__perform("or_in", arguments);};
