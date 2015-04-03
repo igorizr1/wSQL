@@ -30,6 +30,12 @@ var config = {
             './examples/example3/batch_insert_sample.js'
         ]
     },
+    example4: {
+        EXAMPLE_SCRIPTS: [
+            './examples/example4/wSQL.config.js',
+            './examples/example4/app.js'
+        ]
+    },
     SRC_SCRIPTS: [
         '!./**/*_test.js',
         "./src/wSQL.js"
@@ -148,6 +154,7 @@ gulp.task('clean', function () {
 gulp.task('set_example_1', function(){example = 1;});
 gulp.task('set_example_2', function(){example = 2;});
 gulp.task('set_example_3', function(){example = 3;});
+gulp.task('set_example_4', function(){example = 4;});
 
 /**
  * run Examples START
@@ -156,6 +163,7 @@ gulp.task('default',  ['set_example_1', 'scripts_dev', 'copy_index', 'vendorBOWE
 gulp.task('example1', ['set_example_2', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
 gulp.task('example2', ['set_example_2', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
 gulp.task('example3', ['set_example_3', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
+gulp.task('example4', ['set_example_4', 'scripts_dev', 'copy_index', 'vendorBOWER', 'watch_dev', 'connect']);
 
 //gulp.task('build',   ['scripts_min', 'copy_index', 'vendorBOWER', 'connect']);
 

@@ -344,21 +344,34 @@ angular.module('wSQL', [
             return this._where_query("AND", operator1, operator2, comparator);
         };
 
-        CoreQueryBuilder.prototype._where_in_query = function(type, field, values){
+        CoreQueryBuilder.prototype._where_in_query = function(type, field, values, not){
             this._query_data = this._query_data.concat(values);
-            return this._sql += " "+type+" " + field+" IN ("+array_to_sql(values)+")";
+            this._where_flag = true;
+            return this._sql += " "+type+" "+ field + (not ? " NOT IN " : " IN ")+"("+array_to_sql(values)+")";
         };
 
-        CoreQueryBuilder.prototype.where_in = function(field, values) {
-            return this._where_in_query("WHERE", field, values);
+        CoreQueryBuilder.prototype.where_in = function(field, values, not) {
+            return this._where_in_query(this._where_flag ? "AND" : "WHERE", field, values, not);
         };
 
-        CoreQueryBuilder.prototype.or_in = function(field, values){
-            return this._where_in_query("OR", field, values);
+        CoreQueryBuilder.prototype.where_not_in = function(field, values) {
+            return this.where_in(field, values, true);
         };
 
-        CoreQueryBuilder.prototype.and_in = function(field, values){
-            return this._where_in_query("AND", field, values);
+        CoreQueryBuilder.prototype.or_in = function(field, values, not){
+            return this._where_in_query("OR", field, values, not);
+        };
+
+        CoreQueryBuilder.prototype.or_not_in = function(field, values){
+            return this.or_in(field, values, true);
+        };
+
+        CoreQueryBuilder.prototype.and_in = function(field, values, not){
+            return this._where_in_query("AND", field, values, not);
+        };
+
+        CoreQueryBuilder.prototype.and_not_in = function(field, values, not){
+            return this.and_in(field, values, true);
         };
 
         CoreQueryBuilder.prototype._join_query = function(type, table, field1, field2, comparator) {
@@ -434,24 +447,28 @@ angular.module('wSQL', [
                     set: function(){return _this.set.apply(_this, arguments);},
                     where: function(){return _this.where.apply(_this, arguments);},
                     where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    where_not_in: function(){return _this.where_not_in.apply(_this, arguments);},
                     like: function(){return _this.like.apply(_this, arguments);},
                     query: function(){return _this.query.apply(_this, arguments);}
                 },
                 set: {
                     where: function(){return _this.where.apply(_this, arguments);},
                     where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    where_not_in: function(){return _this.where_not_in.apply(_this, arguments);},
                     like: function(){return _this.like.apply(_this, arguments);},
                     query: function(){return _this.query.apply(_this, arguments);}
                 },
                 'delete': {
                     where: function(){return _this.where.apply(_this, arguments);},
                     where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    where_not_in: function(){return _this.where_not_in.apply(_this, arguments);},
                     like: function(){return _this.like.apply(_this, arguments);},
                     query: function(){return _this.query.apply(_this, arguments);}
                 },
                 from: {
                     where: function(){return _this.where.apply(_this, arguments);},
                     where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    where_not_in: function(){return _this.where_not_in.apply(_this, arguments);},
                     like: function(){return _this.like.apply(_this, arguments);},
                     join: function(){return _this.join.apply(_this, arguments);},
                     left_join: function(){return _this.left_join.apply(_this, arguments);},
@@ -465,10 +482,14 @@ angular.module('wSQL', [
                 // where & like & or & and
                 where: {
                     where: function(){return _this.where.apply(_this, arguments);},
+                    where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    where_not_in: function(){return _this.where_not_in.apply(_this, arguments);},
                     and: function(){return _this.and.apply(_this, arguments);},
                     or: function(){return _this.or.apply(_this, arguments);},
                     and_in: function(){return _this.and_in.apply(_this, arguments);},
+                    and_not_in: function(){return _this.and_not_in.apply(_this, arguments);},
                     or_in: function(){return _this.or_in.apply(_this, arguments);},
+                    or_not_in: function(){return _this.or_not_in.apply(_this, arguments);},
                     like: function(){return _this.like.apply(_this, arguments);},
                     and_like: function(){return _this.and_like.apply(_this, arguments);},
                     or_like: function(){return _this.or_like.apply(_this, arguments);},
@@ -482,6 +503,7 @@ angular.module('wSQL', [
                 join: {
                     where: function(){return _this.where.apply(_this, arguments);},
                     where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    where_not_in: function(){return _this.where_not_in.apply(_this, arguments);},
                     like: function(){return _this.like.apply(_this, arguments);},
                     join: function(){return _this.join.apply(_this, arguments);},
                     left_join: function(){return _this.left_join.apply(_this, arguments);},
@@ -512,7 +534,9 @@ angular.module('wSQL', [
                     and: function(){return _this.and.apply(_this, arguments);},
                     or: function(){return _this.or.apply(_this, arguments);},
                     and_in: function(){return _this.and_in.apply(_this, arguments);},
+                    and_not_in: function(){return _this.and_not_in.apply(_this, arguments);},
                     or_in: function(){return _this.or_in.apply(_this, arguments);},
+                    or_not_in: function(){return _this.or_not_in.apply(_this, arguments);},
                     and_like: function(){return _this.and_like.apply(_this, arguments);},
                     or_like: function(){return _this.or_like.apply(_this, arguments);},
                     order_by: function(){return _this.order_by.apply(_this, arguments);},
@@ -530,10 +554,13 @@ angular.module('wSQL', [
             switch(query_type){
                 case 'where':
                 case 'where_in':
+                case 'where_not_in':
                 case 'and':
                 case 'and_in':
+                case 'and_not_in':
                 case 'or':
                 case 'or_in':
+                case 'or_not_in':
                 case 'like':
                 case 'and_like':
                 case 'or_like':
@@ -553,10 +580,13 @@ angular.module('wSQL', [
         QueryBuilder.prototype.from = function(){return this.__perform("from", arguments);};
         QueryBuilder.prototype.where = function(){return this.__perform("where", arguments);};
         QueryBuilder.prototype.where_in = function(){return this.__perform("where_in", arguments);};
+        QueryBuilder.prototype.where_not_in = function(){return this.__perform("where_not_in", arguments);};
         QueryBuilder.prototype.or = function(){return this.__perform("or", arguments);};
         QueryBuilder.prototype.and = function(){return this.__perform("and", arguments);};
         QueryBuilder.prototype.or_in = function(){return this.__perform("or_in", arguments);};
+        QueryBuilder.prototype.or_not_in = function(){return this.__perform("or_not_in", arguments);};
         QueryBuilder.prototype.and_in = function(){return this.__perform("and_in", arguments);};
+        QueryBuilder.prototype.and_not_in = function(){return this.__perform("and_not_in", arguments);};
         QueryBuilder.prototype.like = function(){return this.__perform("like", arguments);};
         QueryBuilder.prototype.or_like = function(){return this.__perform("or_like", arguments);};
         QueryBuilder.prototype.and_like = function(){return this.__perform("and_like", arguments);};
