@@ -696,6 +696,18 @@ angular.module('wSQL', [
         },
         drop_table: function(table){
             return new DropTableQuery().drop(table);
+        },
+        reinit: function(){
+            if(if_debug("warn"))console.warn("DB was cleaned");
+            var drops = [];
+            for(var t in W_SQL_CONFIG.TABLES_SQL) {
+                drops.push(new DropTableQuery().drop(t));
+            }
+            return $q.all(drops).then(function(){
+                for(var t in W_SQL_CONFIG.TABLES_SQL) {
+                    new CreateTableQuery().create(t, W_SQL_CONFIG.TABLES_SQL[t]);
+                }
+            });
         }
     };
 
