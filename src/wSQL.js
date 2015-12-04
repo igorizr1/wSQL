@@ -600,7 +600,7 @@ angular.module('wSQL', [
         QueryBuilder.prototype.or_like = function(){return this.__perform("or_like", arguments);};
         QueryBuilder.prototype.and_like = function(){return this.__perform("and_like", arguments);};
         QueryBuilder.prototype.join = function(){return this.__perform("join", arguments);};
-        QueryBuilder.prototype.left_join = function(){return this.__perform("join", arguments);};
+        QueryBuilder.prototype.left_join = function(){return this.__perform("left_join", arguments);};
         QueryBuilder.prototype.order_by = function(){return this.__perform("order_by", arguments);};
         QueryBuilder.prototype.group_by = function(){return this.__perform("group_by", arguments);};
         QueryBuilder.prototype.having = function(){return this.__perform("having", arguments);};
