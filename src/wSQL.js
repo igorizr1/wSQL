@@ -524,6 +524,21 @@ angular.module('wSQL', [
                     row: function(){return _this.row.apply(_this, arguments);},
                     col: function(){return _this.col.apply(_this, arguments);}
                 },
+                left_join: {
+                    where: function(){return _this.where.apply(_this, arguments);},
+                    where_in: function(){return _this.where_in.apply(_this, arguments);},
+                    where_not_in: function(){return _this.where_not_in.apply(_this, arguments);},
+                    like: function(){return _this.like.apply(_this, arguments);},
+                    join: function(){return _this.join.apply(_this, arguments);},
+                    left_join: function(){return _this.left_join.apply(_this, arguments);},
+                    order_by: function(){return _this.order_by.apply(_this, arguments);},
+                    group_by: function(){return _this.group_by.apply(_this, arguments);},
+                    having: function(){return _this.having.apply(_this, arguments);},
+                    limit: function(){return _this.limit.apply(_this, arguments);},
+                    query: function(){return _this.query.apply(_this, arguments);},
+                    row: function(){return _this.row.apply(_this, arguments);},
+                    col: function(){return _this.col.apply(_this, arguments);}
+                },
                 group_by: {
                     order_by: function(){return _this.order_by.apply(_this, arguments);},
                     having: function(){return _this.having.apply(_this, arguments);},
