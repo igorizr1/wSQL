@@ -198,7 +198,7 @@ angular.module('wSQL', [
     })()
 
     , InsertQuery = (function(){
-        var arguments_max_length = 900;
+        var arguments_max_length = 500;
         function InsertQuery(){}
         InsertQuery.prototype.slice_data = function(data){
             var slices = [],
@@ -255,9 +255,6 @@ angular.module('wSQL', [
 
         InsertQuery.prototype.batch_insert = function(table, data, ignore){
             var slice_result = this.check_data_length(data);
-
-            console.log("slice_result")
-            console.log(slice_result)
 
             if(slice_result)
                 return this.batch_insert_by_slice(table, slice_result, ignore);
